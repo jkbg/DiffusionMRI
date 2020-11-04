@@ -12,13 +12,23 @@ def rgb2gray(rgb):
     return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
 
 
+def load_image(filepath):
+    rgba_image = plt.imread(filepath)
+    rgb_image = rgba_image[:, :, :3]
+    return rgb_image
+
+
 def load_images(filepaths):
     images = []
     for filepath in filepaths:
-        rgba_image = plt.imread(filepath)
-        rgb_image = rgba_image[:, :, :3]
+        rgb_image = load_image(filepath)
         images.append(rgb_image)
     return images
+
+
+def load_noisy_and_target_image(fit_model_configuration):
+    paths = [fit_model_configuration.noisy_image_path, fit_model_configuration.target_image_path]
+    return load_images(paths)
 
 
 def tensor_to_image(tensor):
@@ -31,11 +41,11 @@ def image_to_tensor(image):
     return tensor
 
 
-def show_images(gibbs_image, model_image, target_image, model_description=None, save_plot=False):
+def show_images(noisy_image, model_image, target_image, result_path, model_description=None):
     fig = plt.figure(figsize=(12, 5))
     ax = fig.add_subplot(131)
-    ax.imshow(gibbs_image, "gray")
-    ax.set_title("Gibbs Image")
+    ax.imshow(noisy_image, "gray")
+    ax.set_title("Noisy Image")
     ax.axis("off")
 
     ax = fig.add_subplot(132)
@@ -52,9 +62,8 @@ def show_images(gibbs_image, model_image, target_image, model_description=None, 
     ax.axis("off")
     plt.tight_layout()
 
-    if save_plot:
-        path = "data/results/" + strftime("%Y-%m-%d-%H:%M" + ".png", gmtime())
-        plt.savefig(path)
+    path = result_path + strftime("%Y-%m-%d-%H:%M" + ".png", gmtime())
+    plt.savefig(path)
 
     plt.show()
 
@@ -62,7 +71,8 @@ def show_images(gibbs_image, model_image, target_image, model_description=None, 
 def plot_image_grid(imgs, titles, nrows=4):
     ncols = ceil(len(imgs) / nrows)
     nrows = min(nrows, len(imgs))
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(ncols*4, nrows*5), squeeze=False)
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(ncols * 4, nrows * 5),
+                             squeeze=False)
     for i, row in enumerate(axes):
         for j, ax in enumerate(row):
             if j * nrows + i < len(imgs):

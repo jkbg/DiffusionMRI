@@ -5,23 +5,33 @@ import copy
 from utils.visualization_helpers import image_to_tensor, tensor_to_image
 
 
+def create_fitter_from_configuration(fit_model_configuration):
+    fitter = Fitter(number_of_iterations=fit_model_configuration.number_of_iterations,
+                    learning_rate=fit_model_configuration.learning_rate,
+                    convergence_check_length=fit_model_configuration.convergence_check_length,
+                    log_frequency=fit_model_configuration.log_frequency,
+                    data_type=fit_model_configuration.data_type)
+    return fitter
+
+
 class Fitter:
     def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=40, log_frequency=10,
-                 find_best=False):
+                 find_best=False, data_type=torch.FloatTensor):
         self.loss_fn = torch.nn.MSELoss()
         self.number_of_iterations = number_of_iterations
         self.learning_rate = learning_rate
         self.convergence_check_length = convergence_check_length
         self.log_frequency = log_frequency
         self.find_best = find_best
+        self.data_type = data_type
 
     def __call__(self, model, original_image, target_image=None):
         self.model = model
         self.optimizer = torch.optim.Adam(model.parameters(), lr=self.learning_rate)
         self.step_counter = 0
         self.fixed_net_input = 2 * torch.rand(self.model.get_input_shape()) - 1
-        self.noisy_image = image_to_tensor(original_image)
-        self.target_image = image_to_tensor(target_image)
+        self.noisy_image = image_to_tensor(original_image).type(self.data_type)
+        self.target_image = image_to_tensor(target_image).type(self.data_type)
         self.best_model = copy.deepcopy(self.model)
         self.losses_wrt_noisy = []
         self.losses_wrt_target = []

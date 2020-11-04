@@ -10,9 +10,9 @@ from fitting.Fitter import Fitter
 from utils.visualization_helpers import load_images
 
 IMAGE_PATHS = ["data/raw_images/canonical_noisy.png", "data/raw_images/canonical_target.png"]
-MODEL_TYPES = ['deep', 'conv']
+MODEL_TYPES = ['conv', 'conv']
 INPUT_SHAPES = [[8, 8], [4, 8], [4, 4], [2, 4], [2, 2]]
-NUMBERS_OF_HIDDEN_LAYERS = [4, 5, 6, 7, 8] #, 5, 6, 7, 8
+NUMBERS_OF_HIDDEN_LAYERS = [4, 6, 8] #, 5, 6, 7, 8
 NUMBERS_OF_HIDDEN_CHANNELS = [32, 64, 128, 256]
 
 
@@ -60,7 +60,7 @@ def run_gridsearch(image_paths, model_types, input_shapes, numbers_of_hidden_lay
         file_path = results_path
     parameter_combinations = list(
         product(*[model_types, input_shapes, numbers_of_hidden_layers, numbers_of_hidden_channels]))
-    fitter = Fitter(5000, convergence_check_length=10, log_frequency=50, find_best=True)
+    fitter = Fitter(5000, convergence_check_length=100, log_frequency=50, find_best=True)
     for parameters in list(parameter_combinations):
         print("+++" + str(parameters) + "+++")
         result = test_parameter_combination(parameters, fitter, noisy_image, target_image)
