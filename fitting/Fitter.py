@@ -17,7 +17,7 @@ def create_fitter_from_configuration(fit_model_configuration):
 class Fitter:
     def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=40, log_frequency=10,
                  find_best=False, data_type=torch.FloatTensor):
-        self.loss_fn = torch.nn.MSELoss()
+        self.loss_fn = torch.nn.MSELoss().type(data_type)
         self.number_of_iterations = number_of_iterations
         self.learning_rate = learning_rate
         self.convergence_check_length = convergence_check_length

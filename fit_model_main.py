@@ -5,7 +5,7 @@ from fitting.Fitter import create_fitter_from_configuration
 
 if __name__ == '__main__':
     fit_model_configuration = get_fit_model_configuration()
-    noisy_image, target_image = load_noisy_and_target_image(get_fit_model_configuration())
+    noisy_image, target_image = load_noisy_and_target_image(fit_model_configuration)
     model = create_model_from_configuration(fit_model_configuration)
     fitter = create_fitter_from_configuration(fit_model_configuration)
 
