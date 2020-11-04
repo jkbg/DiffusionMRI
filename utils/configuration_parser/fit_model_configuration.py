@@ -45,11 +45,12 @@ class ModelFittingConfiguration:
         self.convergence_check_length = command_line_arguments.convergence_check_length
         self.log_frequency = command_line_arguments.log_frequency
 
-        self.data_type = torch.cuda.FloatTensor
+
         if command_line_arguments.cpu:
             self.data_type = torch.FloatTensor
         else:
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
+            self.data_type = torch.cuda.FloatTensor
             os.environ['CUDA_VISIBLE_DEVICES'] = '0'
             print("Number of GPUs: ", torch.cuda.device_count())
