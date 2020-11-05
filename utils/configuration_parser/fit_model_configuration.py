@@ -47,7 +47,6 @@ class ModelFittingConfiguration:
         self.log_frequency = command_line_arguments.log_frequency
         self.find_best = command_line_arguments.find_best
 
-
         if command_line_arguments.cpu:
             self.data_type = torch.FloatTensor
         else:
@@ -55,4 +54,11 @@ class ModelFittingConfiguration:
             torch.backends.cudnn.benchmark = True
             self.data_type = torch.cuda.FloatTensor
             os.environ['CUDA_VISIBLE_DEVICES'] = '3'
-            print("Number of GPUs: ", torch.cuda.device_count())
+            print("number of GPUs: ", torch.cuda.device_count())
+
+    def __str__(self):
+        dictionary = self.__dict__
+        result = ""
+        for key in dictionary:
+            result += key + ": " + str(dictionary[key]) + "  " + os.linesep
+        return result
