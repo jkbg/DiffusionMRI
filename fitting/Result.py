@@ -4,8 +4,8 @@ from utils.evaluation_helpers import vifp_mscale
 
 
 class Result:
-    def __init__(self, model_parameters, noisy_image, model_image, target_image, loss_wrt_target, number_of_iterations):
-        self.model_parameters = {'Model Type': model_parameters[0], 'Input Shape': model_parameters[1], 'Number of Hidden Layers': model_parameters[2], 'Number of Hidden Channels': model_parameters[3]}
+    def __init__(self, model_description, noisy_image, model_image, target_image, loss_wrt_target, number_of_iterations):
+        self.model_parameters = model_description
         self.noisy_image = noisy_image
         self.model_image = model_image
         self.target_image = target_image
