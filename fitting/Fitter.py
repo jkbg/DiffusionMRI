@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import copy
 
+from fitting.Result import Result
 from utils.visualization_helpers import image_to_tensor, tensor_to_image
 
 
@@ -42,7 +43,6 @@ class Fitter:
         return self.fit()
 
     def fit(self):
-
         while self.has_not_converged() and self.step_counter < self.number_of_iterations:
 
             def closure():
@@ -117,3 +117,12 @@ class Fitter:
 
     def get_step_counter(self):
         return self.step_counter
+
+    def get_result(self):
+        result = Result(model_parameters=str(self.model),
+                        noisy_image=tensor_to_image(self.noisy_image),
+                        model_image=self.get_best_image(),
+                        target_image=tensor_to_image(self.target_image),
+                        loss_wrt_target=self.get_final_target_loss(),
+                        number_of_iterations=self.step_counter)
+        return result

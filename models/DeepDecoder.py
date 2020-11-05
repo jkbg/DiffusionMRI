@@ -41,18 +41,11 @@ class DeepDecoder(nn.Module):
         return self.input_shape
 
     def __str__(self):
-        output_string = "Deep Decoder"
-        output_string += "\n"
-        output_string += "Input Shape: "
+        output_string = "Deep Decoder "
         output_string += str(self.input_shape)
-        output_string += "\n"
-        output_string += "Output Shape: "
-        output_string += str(self.image_dimensions)
-        output_string += "\n"
-        output_string += "Number of Layers: "
+        output_string += ", "
         output_string += str(self.number_of_layers)
-        output_string += "\n"
-        output_string += "Number of hidden channels: "
+        output_string += ", "
         output_string += str(self.number_of_hidden_channels)
         return output_string
 

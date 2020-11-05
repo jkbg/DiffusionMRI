@@ -49,6 +49,8 @@ class GridsearchConfiguration:
         self.log_frequency = command_line_arguments.log_frequency
         self.find_best = command_line_arguments.find_best
 
+        self.parameter_combinations = []
+
         if command_line_arguments.cpu:
             self.data_type = torch.FloatTensor
         else:
