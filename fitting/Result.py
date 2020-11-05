@@ -9,7 +9,7 @@ class Result:
         self.noisy_image = noisy_image
         self.model_image = model_image
         self.target_image = target_image
-        self.loss_wrt_target = loss_wrt_target
+        self.loss_wrt_target = loss_wrt_target.item()
         self.number_of_iterations = number_of_iterations
         self.vif = vifp_mscale(target_image, model_image)
         self.psnr = peak_signal_noise_ratio(target_image, model_image)
