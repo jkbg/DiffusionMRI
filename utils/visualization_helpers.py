@@ -63,6 +63,7 @@ def show_images(noisy_image, model_image, target_image, result_path, model_descr
     plt.tight_layout()
 
     path = result_path + strftime("%Y-%m-%d-%H:%M" + ".png", gmtime())
+    print('saved at', path)
     plt.savefig(path)
     plt.show()
 
