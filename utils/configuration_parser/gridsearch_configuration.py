@@ -1,6 +1,8 @@
 import argparse
 import torch
 import os
+from itertools import product
+from time import gmtime, strftime
 
 from utils.visualization_helpers import load_image
 
@@ -33,7 +35,7 @@ class GridsearchConfiguration:
     def __init__(self, command_line_arguments):
         self.noisy_image_path = command_line_arguments.noisy_image_path
         self.target_image_path = command_line_arguments.target_image_path
-        self.result_path = command_line_arguments.result_path
+        self.result_path = command_line_arguments.result_path + strftime("%Y-%m-%d-%H:%M-gridsearch.pkl", gmtime())
         self.image_shape = load_image(self.noisy_image_path).shape
 
         self.model_types = command_line_arguments.model_types
@@ -55,6 +57,17 @@ class GridsearchConfiguration:
             self.data_type = torch.cuda.FloatTensor
             os.environ['CUDA_VISIBLE_DEVICES'] = '3'
             print("number of GPUs: ", torch.cuda.device_count())
+
+    def generate_parameter_combinations(self):
+        model_types = self.model_types
+        input_shapes = self.input_shapes
+        numbers_of_layers = self.numbers_of_layers
+        numbers_of_hidden_channels = self.numbers_of_hidden_channels
+        parameter_combinations = list(product(*[model_types,
+                                                input_shapes,
+                                                numbers_of_layers,
+                                                numbers_of_hidden_channels]))
+        return parameter_combinations
 
     def __str__(self):
         dictionary = self.__dict__
