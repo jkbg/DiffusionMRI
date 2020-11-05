@@ -13,19 +13,6 @@ def get_most_recent_gridsearch():
     return file_paths[-1]
 
 
-def map_description(result):
-    output_string = result.model_parameters['Model Type']
-    output_string += ', '
-    output_string += str(result.model_parameters['Input Shape'])
-    output_string += ', '
-    output_string += str(result.model_parameters['Number of Hidden Layers'])
-    output_string += ', '
-    output_string += str(result.model_parameters['Number of Hidden Channels'])
-    output_string += ', '
-    output_string += f'{result.vif:.4f}'
-    return output_string
-
-
 if __name__ == "__main__":
     file_path = get_most_recent_gridsearch()
     results = []
@@ -53,6 +40,6 @@ if __name__ == "__main__":
 
     results.sort(key=lambda x: x.vif, reverse=True)
     images = list(map(lambda x: x.model_image, results))
-    descriptions = list(map(lambda x: map_description(x), results))
+    descriptions = list(map(lambda x: x.model_parameters, results))
     fig = plot_image_grid(images, descriptions, nrows=4)
     plt.show()

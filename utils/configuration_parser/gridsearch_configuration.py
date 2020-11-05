@@ -69,9 +69,7 @@ class GridsearchConfiguration:
                                                 input_shapes,
                                                 numbers_of_layers,
                                                 numbers_of_hidden_channels]))
-        for _ in range(number_of_runs_per_setting):
-            parameter_combinations.extend(parameter_combinations)
-        return parameter_combinations
+        return parameter_combinations * number_of_runs_per_setting
 
     def __str__(self):
         dictionary = self.__dict__
