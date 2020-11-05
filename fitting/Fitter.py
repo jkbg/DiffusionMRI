@@ -121,7 +121,7 @@ class Fitter:
         return self.step_counter
 
     def get_result(self):
-        result = Result(model_parameters=str(self.model),
+        result = Result(model_description=str(self.model),
                         noisy_image=tensor_to_image(self.noisy_image.cpu()),
                         model_image=self.get_best_image(),
                         target_image=tensor_to_image(self.target_image.cpu()),

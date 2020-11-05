@@ -60,7 +60,7 @@ class GridsearchConfiguration:
             os.environ['CUDA_VISIBLE_DEVICES'] = '3'
             print("number of GPUs: ", torch.cuda.device_count())
 
-    def generate_parameter_combinations(self):
+    def generate_parameter_combinations(self, number_of_runs_per_setting=1):
         model_types = self.model_types
         input_shapes = self.input_shapes
         numbers_of_layers = self.numbers_of_layers
@@ -69,6 +69,8 @@ class GridsearchConfiguration:
                                                 input_shapes,
                                                 numbers_of_layers,
                                                 numbers_of_hidden_channels]))
+        for _ in range(number_of_runs_per_setting):
+            parameter_combinations.extend(parameter_combinations)
         return parameter_combinations
 
     def __str__(self):
