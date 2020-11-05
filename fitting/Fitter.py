@@ -64,7 +64,7 @@ class Fitter:
             return True
         else:
             if np.argmin(self.losses_wrt_noisy) < len(self.losses_wrt_noisy) - self.convergence_check_length:
-                print('\n')
+                print('')
                 print(f"Adam has converged at step {self.step_counter}.")
                 return False
         if not self.find_best:
