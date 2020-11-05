@@ -42,7 +42,7 @@ class DeepDecoder(nn.Module):
 
     def __str__(self):
         output_string = "Deep Decoder "
-        output_string += str(self.input_shape)
+        output_string += str(self.input_shape[-2:])
         output_string += ", "
         output_string += str(self.number_of_layers)
         output_string += ", "
