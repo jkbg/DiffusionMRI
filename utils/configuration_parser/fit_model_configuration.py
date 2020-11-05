@@ -54,5 +54,5 @@ class ModelFittingConfiguration:
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
             self.data_type = torch.cuda.FloatTensor
-            os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+            os.environ['CUDA_VISIBLE_DEVICES'] = '3'
             print("Number of GPUs: ", torch.cuda.device_count())

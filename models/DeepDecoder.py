@@ -7,13 +7,13 @@ from torchsummary import summary
 
 
 class DeepDecoder(nn.Module):
-    def __init__(self, input_shape, output_shape, number_of_layers, number_of_hidden_channels):
+    def __init__(self, input_shape, image_dimensions, number_of_layers, number_of_hidden_channels):
         super(DeepDecoder, self).__init__()
         self.input_shape = [1, number_of_hidden_channels] + input_shape
-        self.image_dimensions = output_shape[:2]
+        self.image_dimensions = image_dimensions[:2]
         self.number_of_layers = number_of_layers
         self.number_of_hidden_channels = number_of_hidden_channels
-        self.number_of_output_channels = output_shape[2]
+        self.number_of_output_channels = image_dimensions[2]
         upsample_sizes = calculate_upsample_sizes(input_shape, self.image_dimensions, number_of_layers)
 
         # Initialize Module List to be filled with Module consisting of layers
