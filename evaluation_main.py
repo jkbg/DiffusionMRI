@@ -35,7 +35,6 @@ if __name__ == "__main__":
                 results.append(pickle.load(input))
             except EOFError:
                 break
-    get_most_recent_gridsearch()
     results.sort(key=lambda x: x.loss_wrt_target.item())
     losses_wrt_target = list(map(lambda x: x.loss_wrt_target.item(), results))
     # vif = vifp_mscale(rgb2gray(target_image), rgb2gray(noisy_image))

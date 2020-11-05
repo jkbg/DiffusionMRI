@@ -10,7 +10,7 @@ from fitting.Fitter import Fitter
 from utils.visualization_helpers import load_images
 
 IMAGE_PATHS = ["data/raw_images/canonical_noisy.png", "data/raw_images/canonical_target.png"]
-MODEL_TYPES = ['conv', 'conv']
+MODEL_TYPES = ['conv', 'deep']
 INPUT_SHAPES = [[8, 8], [4, 8], [4, 4], [2, 4], [2, 2]]
 NUMBERS_OF_HIDDEN_LAYERS = [4, 6, 8] #, 5, 6, 7, 8
 NUMBERS_OF_HIDDEN_CHANNELS = [32, 64, 128, 256]
