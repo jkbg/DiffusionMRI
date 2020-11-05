@@ -103,7 +103,7 @@ class Fitter:
             log_string += f"Target Loss: {self.losses_wrt_target[-1]:.6f}"
         if self.find_best:
             log_string += ', '
-            log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss}'
+            log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss:.6f}'
         print(log_string, end='\r')
 
     def get_best_image(self):
