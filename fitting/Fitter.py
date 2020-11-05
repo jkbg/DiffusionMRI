@@ -76,7 +76,7 @@ class Fitter:
 
         if self.find_best:
             if self.step_counter > 0:
-                print('updated')
+                print(f'{self.step_counter}', end='/r')
                 if min(self.losses_wrt_noisy[:-1]) > 1.005 * current_loss_wrt_noisy.data:
                     self.best_model = copy.deepcopy(self.model)
         elif self.step_counter == self.number_of_iterations - 1:
