@@ -12,4 +12,4 @@ if __name__ == '__main__':
     fitter(model, noisy_image, target_image)
 
     model_image = fitter.get_best_image()
-    show_images(noisy_image, model_image, target_image, str(model), fit_model_configuration.result_path)
+    show_images(noisy_image, model_image, target_image, fit_model_configuration.result_path, str(model))
