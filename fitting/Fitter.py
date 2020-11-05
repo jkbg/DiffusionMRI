@@ -64,7 +64,8 @@ class Fitter:
             return True
         else:
             if np.argmin(self.losses_wrt_noisy) < len(self.losses_wrt_noisy) - self.convergence_check_length:
-                print('')
+                if self.data_type == torch.cuda.FloatTensor:
+                    print('')
                 print(f"Adam has converged at step {self.step_counter}.")
                 return False
         if not self.find_best:
@@ -104,6 +105,7 @@ class Fitter:
         if self.find_best:
             log_string += ', '
             log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss:.6f}'
+
         if self.data_type == torch.cuda.FloatTensor:
             print(log_string, end='\r')
         else:
@@ -120,9 +122,9 @@ class Fitter:
 
     def get_result(self):
         result = Result(model_parameters=str(self.model),
-                        noisy_image=tensor_to_image(self.noisy_image),
+                        noisy_image=tensor_to_image(self.noisy_image.cpu()),
                         model_image=self.get_best_image(),
-                        target_image=tensor_to_image(self.target_image),
+                        target_image=tensor_to_image(self.target_image.cpu()),
                         loss_wrt_target=self.get_final_target_loss(),
                         number_of_iterations=self.step_counter)
         return result
