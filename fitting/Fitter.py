@@ -63,6 +63,7 @@ class Fitter:
             return True
         else:
             if np.argmin(self.losses_wrt_noisy) < len(self.losses_wrt_noisy) - self.convergence_check_length:
+                print('\n')
                 print(f"Adam has converged at step {self.step_counter}.")
                 return False
         if not self.find_best:
@@ -100,7 +101,7 @@ class Fitter:
             log_string += f"Target Loss: {self.losses_wrt_target[-1]:.6f}"
         if self.find_best:
             log_string += ', '
-            log_string += f'best model last updated at step {self.best_model_step}'
+            log_string += f'Minimum Loss at: {self.best_model_step}'
         print(log_string, end='\r')
 
     def get_best_image(self):
