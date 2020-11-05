@@ -5,9 +5,9 @@ import os
 from utils.visualization_helpers import load_image
 
 
-def get_fit_model_configuration():
+def get_gridsearch_configuration():
     command_line_arguments = parse_command_line_arguments()
-    return ModelFittingConfiguration(command_line_arguments)
+    return GridsearchConfiguration(command_line_arguments)
 
 
 def parse_command_line_arguments():
@@ -15,10 +15,10 @@ def parse_command_line_arguments():
     parser.add_argument('--noisy-image-path', type=str, default='data/raw_images/canonical_noisy.png')
     parser.add_argument('--target-image-path', type=str, default='data/raw_images/canonical_target.png')
     parser.add_argument('--result-path', type=str, default='data/results/')
-    parser.add_argument('--model-type', type=str, default='deep')
-    parser.add_argument('--input-shape', type=input_shape, default=(8, 8))
-    parser.add_argument('--number-of-layers', type=int, default=6)
-    parser.add_argument('--number-of-hidden-channels', type=int, default=128)
+    parser.add_argument('--model-types', type=str, nargs='+', default=['deep', 'conv'])
+    parser.add_argument('--input-shapes', type=input_shape, nargs='+', default=[[2, 2], [4, 4], [8, 8]])
+    parser.add_argument('--numbers-of-layers', type=int, nargs='+', default=[4, 6, 8])
+    parser.add_argument('--numbers-of-hidden-channels', type=int, nargs='+', default=[128])
     parser.add_argument('--number-of-iterations', type=int, default=30000)
     parser.add_argument('--learning-rate', type=float, default=0.1)
     parser.add_argument('--convergence-check-length', type=int, default=100)
@@ -29,17 +29,17 @@ def parse_command_line_arguments():
     return parsed_arguments
 
 
-class ModelFittingConfiguration:
+class GridsearchConfiguration:
     def __init__(self, command_line_arguments):
         self.noisy_image_path = command_line_arguments.noisy_image_path
         self.target_image_path = command_line_arguments.target_image_path
         self.result_path = command_line_arguments.result_path
         self.image_shape = load_image(self.noisy_image_path).shape
 
-        self.model_type = command_line_arguments.model_type
-        self.input_shape = list(command_line_arguments.input_shape)
-        self.number_of_layers = command_line_arguments.number_of_layers
-        self.number_of_hidden_channels = command_line_arguments.number_of_hidden_channels
+        self.model_types = command_line_arguments.model_types
+        self.input_shapes = command_line_arguments.input_shapes
+        self.numbers_of_layers = command_line_arguments.numbers_of_layers
+        self.numbers_of_hidden_channels = command_line_arguments.numbers_of_hidden_channels
 
         self.number_of_iterations = command_line_arguments.number_of_iterations
         self.learning_rate = command_line_arguments.learning_rate
@@ -70,3 +70,7 @@ def input_shape(string):
         return [x, y]
     except:
         raise argparse.ArgumentTypeError("Input Shapes must be x, y")
+
+
+if __name__ == "__main__":
+    print(get_gridsearch_configuration())

@@ -104,7 +104,10 @@ class Fitter:
         if self.find_best:
             log_string += ', '
             log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss:.6f}'
-        print(log_string, end='\r')
+        if self.data_type == torch.cuda.FloatTensor:
+            print(log_string, end='\r')
+        else:
+            print(log_string)
 
     def get_best_image(self):
         return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())

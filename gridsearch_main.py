@@ -1,18 +1,18 @@
-import os
-import pickle
 from time import gmtime, strftime
 from itertools import product
 
+from fitting.Fitter import create_fitter_from_configuration
 from fitting.Result import Result
 from models.ConvolutionDecoder import ConvolutionDecoder
 from models.DeepDecoder import DeepDecoder
-from fitting.Fitter import Fitter
-from utils.visualization_helpers import load_images
+from utils.configuration_parser.gridsearch_configuration import get_gridsearch_configuration
+from utils.pickle_utils import save_gridsearch_result
+from utils.visualization_helpers import load_noisy_and_target_image
 
 IMAGE_PATHS = ["data/raw_images/canonical_noisy.png", "data/raw_images/canonical_target.png"]
 MODEL_TYPES = ['conv', 'deep']
 INPUT_SHAPES = [[8, 8], [4, 8], [4, 4], [2, 4], [2, 2]]
-NUMBERS_OF_HIDDEN_LAYERS = [4, 6, 8] #, 5, 6, 7, 8
+NUMBERS_OF_HIDDEN_LAYERS = [4, 6, 8]  # , 5, 6, 7, 8
 NUMBERS_OF_HIDDEN_CHANNELS = [32, 64, 128, 256]
 
 
@@ -27,45 +27,25 @@ def test_parameter_combination(parameters, fitter, noisy_image, target_image):
     return result
 
 
-def generate_file_path():
-    file_path = "data/results/" + strftime("%Y-%m-%d-%H:%M-gridsearch.pkl", gmtime())
-    return file_path
-
-
-def load_results(file_path):
-    results = []
-    if os.path.isfile(file_path):
-        with open(file_path, 'rb') as input:
-            while True:
-                try:
-                    results.append(pickle.load(input))
-                except EOFError:
-                    break
-    return results
-
-
-def save_gridsearch_result(result, file_path):
-    results = load_results(file_path)
-    results.append(result)
-    with open(file_path, 'wb') as output:
-        for result in results:
-            pickle.dump(result, output, pickle.HIGHEST_PROTOCOL)
-
-
-def run_gridsearch(image_paths, model_types, input_shapes, numbers_of_hidden_layers, numbers_of_hidden_channels, results_path=None):
-    noisy_image, target_image = load_images(image_paths)
-    if results_path is None:
-        file_path = generate_file_path()
-    else:
-        file_path = results_path
-    parameter_combinations = list(
-        product(*[model_types, input_shapes, numbers_of_hidden_layers, numbers_of_hidden_channels]))
-    fitter = Fitter(5000, convergence_check_length=100, log_frequency=50, find_best=True)
-    for parameters in list(parameter_combinations):
-        print("+++" + str(parameters) + "+++")
-        result = test_parameter_combination(parameters, fitter, noisy_image, target_image)
-        save_gridsearch_result(result, file_path)
+def generate_parameter_combinations(gridsearch_configuration):
+    model_types = gridsearch_configuration.model_types
+    input_shapes = gridsearch_configuration.input_shapes
+    numbers_of_layers = gridsearch_configuration.numbers_of_layers
+    numbers_of_hidden_channels = gridsearch_configuration.numbers_of_hidden_channels
+    parameter_combinations = list(product(*[model_types,
+                                            input_shapes,
+                                            numbers_of_layers,
+                                            numbers_of_hidden_channels]))
+    return parameter_combinations
 
 
 if __name__ == '__main__':
-    run_gridsearch(IMAGE_PATHS, MODEL_TYPES, INPUT_SHAPES, NUMBERS_OF_HIDDEN_LAYERS, NUMBERS_OF_HIDDEN_CHANNELS)
+    gridsearch_configuration = get_gridsearch_configuration()
+    noisy_image, target_image = load_noisy_and_target_image(gridsearch_configuration)
+    file_path = gridsearch_configuration.result_path + strftime("%Y-%m-%d-%H:%M-gridsearch.pkl", gmtime())
+    fitter = create_fitter_from_configuration(gridsearch_configuration)
+    parameter_combinations = generate_parameter_combinations(gridsearch_configuration)
+    for parameters in parameter_combinations:
+        print("+++" + str(parameters) + "+++")
+        result = test_parameter_combination(parameters, fitter, noisy_image, target_image)
+        save_gridsearch_result(result, file_path)
