@@ -21,6 +21,7 @@ def parse_command_line_arguments():
     parser.add_argument('--input-shapes', type=input_shape, nargs='+', default=[[2, 2], [4, 4], [8, 8]])
     parser.add_argument('--numbers-of-layers', type=int, nargs='+', default=[4, 6, 8])
     parser.add_argument('--numbers-of-hidden-channels', type=int, nargs='+', default=[128])
+    parser.add_argument('--number-of-runs', type=int, default=1)
     parser.add_argument('--number-of-iterations', type=int, default=30000)
     parser.add_argument('--learning-rate', type=float, default=0.1)
     parser.add_argument('--convergence-check-length', type=int, default=100)
@@ -42,6 +43,7 @@ class GridsearchConfiguration:
         self.input_shapes = command_line_arguments.input_shapes
         self.numbers_of_layers = command_line_arguments.numbers_of_layers
         self.numbers_of_hidden_channels = command_line_arguments.numbers_of_hidden_channels
+        self.number_of_runs = command_line_arguments.number_of_runs
 
         self.number_of_iterations = command_line_arguments.number_of_iterations
         self.learning_rate = command_line_arguments.learning_rate
@@ -60,7 +62,7 @@ class GridsearchConfiguration:
             os.environ['CUDA_VISIBLE_DEVICES'] = '3'
             print("number of GPUs: ", torch.cuda.device_count())
 
-    def generate_parameter_combinations(self, number_of_runs_per_setting=1):
+    def generate_parameter_combinations(self):
         model_types = self.model_types
         input_shapes = self.input_shapes
         numbers_of_layers = self.numbers_of_layers
@@ -69,7 +71,7 @@ class GridsearchConfiguration:
                                                 input_shapes,
                                                 numbers_of_layers,
                                                 numbers_of_hidden_channels]))
-        return parameter_combinations * number_of_runs_per_setting
+        return parameter_combinations * self.number_of_runs
 
     def __str__(self):
         dictionary = self.__dict__
