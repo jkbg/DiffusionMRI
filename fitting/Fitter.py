@@ -98,7 +98,7 @@ class Fitter:
         print(log_string)
 
     def get_best_image(self):
-        return tensor_to_image(self.best_model(self.fixed_net_input).detach())
+        return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())
 
     def get_final_target_loss(self):
         return self.loss_fn(self.best_model(self.fixed_net_input).detach(), self.target_image).data
