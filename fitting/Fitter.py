@@ -36,6 +36,7 @@ class Fitter:
         self.target_image = image_to_tensor(target_image).type(self.data_type)
         self.best_model = copy.deepcopy(self.model)
         self.best_model_step = 0
+        self.best_model_loss = 1000
         self.losses_wrt_noisy = []
         self.losses_wrt_target = []
         return self.fit()
@@ -78,9 +79,10 @@ class Fitter:
 
         if self.find_best:
             if self.step_counter > 0:
-                if min(self.losses_wrt_noisy[:-1]) > 1.005 * current_loss_wrt_noisy.data:
+                if self.best_model_loss > 1.005 * current_loss_wrt_noisy.data:
                     self.best_model = copy.deepcopy(self.model)
                     self.best_model_step = self.step_counter
+                    self.best_model_loss = current_loss_wrt_noisy.data
         elif self.step_counter == self.number_of_iterations - 1:
             self.best_model = copy.deepcopy(self.model)
 
@@ -101,7 +103,7 @@ class Fitter:
             log_string += f"Target Loss: {self.losses_wrt_target[-1]:.6f}"
         if self.find_best:
             log_string += ', '
-            log_string += f'Minimum Loss at: {self.best_model_step}'
+            log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss}'
         print(log_string, end='\r')
 
     def get_best_image(self):
