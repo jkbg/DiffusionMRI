@@ -10,6 +10,7 @@ def create_fitter_from_configuration(fit_model_configuration):
                     learning_rate=fit_model_configuration.learning_rate,
                     convergence_check_length=fit_model_configuration.convergence_check_length,
                     log_frequency=fit_model_configuration.log_frequency,
+                    find_best=fit_model_configuration.find_best,
                     data_type=fit_model_configuration.data_type)
     return fitter
 

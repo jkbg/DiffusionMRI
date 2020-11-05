@@ -23,6 +23,7 @@ def parse_command_line_arguments():
     parser.add_argument('--learning-rate', type=float, default=0.1)
     parser.add_argument('--convergence-check-length', type=int, default=100)
     parser.add_argument('--log-frequency', type=int, default=1)
+    parser.add_argument('--find-best', type=bool, default=True)
     parser.add_argument('--cpu', action='store_true')
     parsed_arguments, non_parsed_arguments = parser.parse_known_args()
     return parsed_arguments
@@ -44,6 +45,7 @@ class ModelFittingConfiguration:
         self.learning_rate = command_line_arguments.learning_rate
         self.convergence_check_length = command_line_arguments.convergence_check_length
         self.log_frequency = command_line_arguments.log_frequency
+        self.find_best = command_line_arguments.find_best
 
 
         if command_line_arguments.cpu:
