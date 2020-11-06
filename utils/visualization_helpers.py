@@ -4,8 +4,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import torch
 from time import gmtime, strftime
-import os
-from matplotlib.image import imsave
 
 
 def rgb2gray(rgb):
@@ -42,7 +40,10 @@ def image_to_tensor(image):
 
 
 def show_images(noisy_image, model_image, target_image, result_path, model_description=None):
+    model_image = np.clip(model_image, 0, 1)
+
     fig = plt.figure(figsize=(12, 5))
+
     ax = fig.add_subplot(131)
     ax.imshow(noisy_image, "gray")
     ax.set_title("Noisy Image")
