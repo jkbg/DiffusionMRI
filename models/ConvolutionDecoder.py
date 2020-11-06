@@ -54,6 +54,9 @@ class ConvolutionDecoder(nn.Module):
         output_string += str(self.number_of_hidden_channels)
         return output_string
 
+    def get_model_parameters(self):
+        return ['conv', self.input_shape[-2:], self.number_of_layers, self.number_of_hidden_channels]
+
 
 def calculate_upsample_sizes(input_shape, output_shape, number_of_layers):
     scale = (np.array(output_shape) / np.array(input_shape)) ** (1 / (number_of_layers - 1))

@@ -49,25 +49,8 @@ class DeepDecoder(nn.Module):
         output_string += str(self.number_of_hidden_channels)
         return output_string
 
-
-def add_module(self, module):
-    self.add_module(str(len(self) + 1), module)
-
-
-torch.nn.Module.add = add_module
-
-
-def conv(in_f, out_f, kernel_size, stride=1, pad='zero'):
-    padder = None
-    to_pad = int((kernel_size - 1) / 2)
-    if pad == 'reflection':
-        padder = nn.ReflectionPad2d(to_pad)
-        to_pad = 0
-
-    convolver = nn.Conv2d(in_f, out_f, kernel_size, stride, padding=to_pad, bias=False)
-
-    layers = filter(lambda x: x is not None, [padder, convolver])
-    return nn.Sequential(*layers)
+    def get_model_parameters(self):
+        return ['deep', self.input_shape[-2:], self.number_of_layers, self.number_of_hidden_channels]
 
 
 def calculate_upsample_sizes(input_shape, output_shape, number_of_layers):
