@@ -40,7 +40,7 @@ def image_to_tensor(image):
 
 
 def show_images(noisy_image, model_image, target_image, result_path, model_description=None):
-    model_image = np.clip(model_image, 0, 1)
+    model_image = (model_image * 255).astype(np.uint8)
 
     fig = plt.figure(figsize=(12, 5))
 
