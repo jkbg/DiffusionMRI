@@ -22,8 +22,8 @@ if __name__ == "__main__":
                 results.append(pickle.load(input))
             except EOFError:
                 break
-    results.sort(key=lambda x: x.loss_wrt_target.item())
-    losses_wrt_target = list(map(lambda x: x.loss_wrt_target.item(), results))
+    results.sort(key=lambda x: x.loss_wrt_target)
+    losses_wrt_target = list(map(lambda x: x.loss_wrt_target, results))
     # vif = vifp_mscale(rgb2gray(target_image), rgb2gray(noisy_image))
     # print(f'Noisy Image VIF: {vif:.4f}')
     # psnr = psnr(results[0].target_image, results[0].noisy_image)

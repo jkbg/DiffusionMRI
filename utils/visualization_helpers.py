@@ -39,8 +39,15 @@ def image_to_tensor(image):
     return tensor
 
 
+def prepare_for_plot(image):
+    image = np.array(image)
+    image = image - np.min(image)
+    image = image / np.max(image)
+    return (image * 255).astype(np.uint8)
+
+
 def show_images(noisy_image, model_image, target_image, result_path, model_description=None):
-    model_image = (model_image * 255).astype(np.uint8)
+    model_image = prepare_for_plot(model_image)
 
     fig = plt.figure(figsize=(12, 5))
 
@@ -70,14 +77,17 @@ def show_images(noisy_image, model_image, target_image, result_path, model_descr
 
 
 def plot_image_grid(imgs, titles, nrows=4):
-    ncols = ceil(len(imgs) / nrows)
-    nrows = min(nrows, len(imgs))
+    clipped_imgs = []
+    for img in imgs:
+        clipped_imgs.append(prepare_for_plot(img))
+    ncols = ceil(len(clipped_imgs) / nrows)
+    nrows = min(nrows, len(clipped_imgs))
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(ncols * 4, nrows * 5),
                              squeeze=False)
     for i, row in enumerate(axes):
         for j, ax in enumerate(row):
-            if j * nrows + i < len(imgs):
-                ax.imshow(imgs[j * nrows + i], cmap='Greys_r', interpolation='none')
+            if j * nrows + i < len(clipped_imgs):
+                ax.imshow(clipped_imgs[j * nrows + i], cmap='Greys_r', interpolation='none')
                 ax.set_title(titles[j * nrows + i])
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
