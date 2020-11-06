@@ -4,11 +4,12 @@ from utils.evaluation_helpers import vifp_mscale
 
 
 class Result:
-    def __init__(self, model_description, noisy_image, model_image, target_image, loss_wrt_target, number_of_iterations):
+    def __init__(self, model_description, noisy_image, model_image, target_image, loss_wrt_target, number_of_iterations, best_loss_wrt_noisy):
         self.model_parameters = model_description
         self.noisy_image = noisy_image
         self.model_image = model_image
         self.target_image = target_image
+        self.best_loss_wrt_noisy = best_loss_wrt_noisy
         self.loss_wrt_target = loss_wrt_target.item()
         self.number_of_iterations = number_of_iterations
         self.vif = vifp_mscale(target_image, model_image)
