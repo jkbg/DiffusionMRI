@@ -16,9 +16,7 @@ class Result:
         self.loss_wrt_target = loss_wrt_target
         self.number_of_iterations = number_of_iterations
         self.vif = vifp_mscale(target_image, model_image)
-        print('target max:', np.max(target_image), 'target min:', np.min(target_image))
-        print('model max:', np.max(model_image), 'model min:', np.min(model_image))
-        self.psnr = peak_signal_noise_ratio(target_image, model_image)
+        self.psnr = peak_signal_noise_ratio(target_image/np.max(target_image), model_image/np.max(model_image))
 
     def __str__(self):
         output_string = str(self.loss_wrt_target)
