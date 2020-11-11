@@ -46,7 +46,7 @@ def prepare_for_plot(image):
     return (image * 255).astype(np.uint8)
 
 
-def show_images(noisy_image, model_image, target_image, result_path, model_description=None):
+def show_images(noisy_image, model_image, target_image, result_path=None, model_description=None):
     model_image = prepare_for_plot(model_image)
 
     fig = plt.figure(figsize=(12, 5))
@@ -70,10 +70,11 @@ def show_images(noisy_image, model_image, target_image, result_path, model_descr
     ax.axis("off")
     plt.tight_layout()
 
-    path = result_path + strftime("%Y-%m-%d-%H:%M" + ".png", gmtime())
-    print('saved at', path)
-    plt.savefig(path)
-    plt.show()
+    if result_path is not None:
+        path = result_path + strftime("%Y-%m-%d-%H:%M" + ".png", gmtime())
+        plt.savefig(path)
+        print('saved at', path)
+        plt.show()
 
 
 def plot_image_grid(imgs, titles, nrows=4):
