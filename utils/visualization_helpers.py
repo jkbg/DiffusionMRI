@@ -90,10 +90,10 @@ def plot_image_grid(imgs, titles=None, nrows=4):
                              squeeze=False)
     for i, column in enumerate(axes.T):
         for j, ax in enumerate(column):
-            if j * nrows + i < len(clipped_imgs):
-                ax.imshow(clipped_imgs[j * nrows + i], cmap='Greys_r', interpolation='none')
+            if j * ncols + i < len(clipped_imgs):
+                ax.imshow(clipped_imgs[j * ncols + i], cmap='Greys_r', interpolation='none')
                 if titles is not None:
-                    ax.set_title(titles[j * nrows + i])
+                    ax.set_title(titles[j * ncols + i])
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
     fig.tight_layout(pad=0.1)

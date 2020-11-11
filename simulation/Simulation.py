@@ -3,7 +3,7 @@ import simulation.dldegibbs as transforms
 
 from matplotlib import pyplot as plt
 
-from utils.visualization_helpers import load_image, rgb2gray
+from utils.visualization_helpers import load_image, rgb2gray, plot_image_grid
 
 
 class Simulation:
@@ -74,22 +74,30 @@ class Simulation:
 
 
 if __name__ == '__main__':
-    image = load_image("data/raw_images/MRI_Test.png")
-    image = rgb2gray(image)
-    input_size = image.shape[:2]
-    sim = Simulation(input_size=input_size,
-                     cropped_size=(256, 256),
-                     flip=False,
-                     transpose=False,
-                     ellipse=False,
-                     snr_range=(0, 6),
-                     noise_sigma=None,
-                     pf_factor=5,
-                     mask_target=False)
-    noisy_image, target_image = sim(image)
-    fig = plt.figure(figsize=(12, 5))
-    ax = fig.add_subplot(121)
-    ax.imshow(noisy_image, 'gray')
-    ax = fig.add_subplot(122)
-    ax.imshow(target_image, 'gray')
+    diagonal_image = load_image("data/raw_images/MRI_Test.png")
+    vertical_image = load_image("data/raw_images/cameraman.png")
+    diagonal_image = rgb2gray(diagonal_image)
+    vertical_image = rgb2gray(vertical_image)
+
+    snr_range = [1, 2, 4, 8, 16, 32, 64]
+    number_of_runs_per_snr = 3
+
+    diagonal_noisy_images = []
+    diagonal_target_images = []
+    vertical_noisy_images = []
+    vertical_target_images = []
+    for snr in snr_range:
+        simulation = Simulation(cropped_size=(256, 256), snr_range=(snr, snr))
+        for index in range(number_of_runs_per_snr):
+            diagonal_noisy_image, diagonal_target_image = simulation(diagonal_image)
+            diagonal_noisy_images.append(diagonal_noisy_image)
+            diagonal_target_images.append(diagonal_target_image)
+            vertical_noisy_image, vertical_target_image = simulation(vertical_image)
+            vertical_noisy_images.append(vertical_noisy_image)
+            vertical_target_images.append(vertical_target_image)
+            print(f'{snr} SNR: {index + 1}/{number_of_runs_per_snr}', end='\r')
+        print('')
+
+    noisy_images = diagonal_noisy_images + vertical_noisy_images
+    plot = plot_image_grid(noisy_images, nrows=2 * len(snr_range))
     plt.show()
