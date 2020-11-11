@@ -42,10 +42,10 @@ class MriNormalize(object):
         # normalize the data
         if self.percentile_norm is None:
             siglevel = np.mean(np.absolute(target[0, ...]))
-        elif self.percentile_norm is 'Max':
-            target_siglevel = np.max(np.absolute(target[0, ...]))
-            dat_siglevel = np.max(np.absolute(target[0, ...]))
-            siglevel= np.max(target_siglevel, dat_siglevel)
+        elif self.percentile_norm == 'Max':
+            target_siglevel = np.max(np.absolute(target))
+            dat_siglevel = np.max(np.absolute(dat[0, ...]))
+            siglevel= max(target_siglevel, dat_siglevel)
         else:
             siglevel = np.percentile(np.absolute(
                 dat[0, ...]), self.percentile_norm)
