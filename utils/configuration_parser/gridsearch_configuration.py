@@ -4,8 +4,6 @@ import os
 from itertools import product
 from time import gmtime, strftime
 
-from utils.visualization_helpers import load_image
-
 
 def get_gridsearch_configuration():
     command_line_arguments = parse_command_line_arguments()
@@ -14,8 +12,7 @@ def get_gridsearch_configuration():
 
 def parse_command_line_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--noisy-image-path', type=str, default='data/raw_images/canonical_noisy.png')
-    parser.add_argument('--target-image-path', type=str, default='data/raw_images/canonical_target.png')
+    parser.add_argument('--image-dimensions', type=int,  nargs='+', default=[256, 256, 1])
     parser.add_argument('--result-path', type=str, default='data/results/')
     parser.add_argument('--model-types', type=str, nargs='+', default=['deep', 'conv'])
     parser.add_argument('--input-shapes', type=input_shape, nargs='+', default=[[2, 2], [4, 4], [8, 8]])
@@ -34,10 +31,9 @@ def parse_command_line_arguments():
 
 class GridsearchConfiguration:
     def __init__(self, command_line_arguments):
-        self.noisy_image_path = command_line_arguments.noisy_image_path
-        self.target_image_path = command_line_arguments.target_image_path
+        self.image_dimensions = command_line_arguments.image_dimensions
         self.result_path = command_line_arguments.result_path + strftime("%Y-%m-%d-%H:%M-gridsearch.pkl", gmtime())
-        self.image_shape = load_image(self.noisy_image_path).shape
+
 
         self.model_types = command_line_arguments.model_types
         self.input_shapes = command_line_arguments.input_shapes

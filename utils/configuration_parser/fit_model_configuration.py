@@ -2,8 +2,6 @@ import argparse
 import torch
 import os
 
-from utils.visualization_helpers import load_image
-
 
 def get_fit_model_configuration():
     command_line_arguments = parse_command_line_arguments()
@@ -12,8 +10,7 @@ def get_fit_model_configuration():
 
 def parse_command_line_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--noisy-image-path', type=str, default='data/raw_images/canonical_noisy.png')
-    parser.add_argument('--target-image-path', type=str, default='data/raw_images/canonical_target.png')
+    parser.add_argument('--image-dimensions', type=int,  nargs='+', default=[256, 256, 1])
     parser.add_argument('--result-path', type=str, default='data/results/')
     parser.add_argument('--model-type', type=str, default='deep')
     parser.add_argument('--input-shape', type=input_shape, default=(8, 8))
@@ -31,10 +28,8 @@ def parse_command_line_arguments():
 
 class ModelFittingConfiguration:
     def __init__(self, command_line_arguments):
-        self.noisy_image_path = command_line_arguments.noisy_image_path
-        self.target_image_path = command_line_arguments.target_image_path
+        self.image_dimensions = command_line_arguments.image_dimensions
         self.result_path = command_line_arguments.result_path
-        self.image_shape = load_image(self.noisy_image_path).shape
 
         self.model_type = command_line_arguments.model_type
         self.input_shape = list(command_line_arguments.input_shape)

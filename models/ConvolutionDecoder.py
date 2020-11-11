@@ -10,11 +10,11 @@ class ConvolutionDecoder(nn.Module):
     def __init__(self, input_shape, image_dimensions, number_of_layers, number_of_hidden_channels):
         super(ConvolutionDecoder, self).__init__()
         self.input_shape = [1, 1] + input_shape
-        self.output_shape = image_dimensions[:2]
+        self.image_dimensions = image_dimensions[:2]
         self.number_of_layers = number_of_layers
         self.number_of_hidden_channels = number_of_hidden_channels
         self.number_of_output_channels = image_dimensions[2]
-        upsample_sizes = calculate_upsample_sizes(input_shape, self.output_shape, number_of_layers)
+        upsample_sizes = calculate_upsample_sizes(input_shape, self.image_dimensions, number_of_layers)
 
         # Initialize Module List to be filled with Module consisting of layers
         self.module_list = nn.ModuleList()
