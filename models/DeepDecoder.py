@@ -35,7 +35,7 @@ class DeepDecoder(nn.Module):
     def forward(self, x):
         for module in self.module_list:
             x = module(x)
-        return torch.squeeze(x)
+        return torch.x
 
     def get_input_shape(self):
         return self.input_shape
