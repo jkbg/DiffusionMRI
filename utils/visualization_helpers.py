@@ -77,7 +77,7 @@ def show_images(noisy_image, model_image, target_image, result_path=None, model_
         plt.show()
 
 
-def plot_image_grid(imgs, titles, nrows=4):
+def plot_image_grid(imgs, titles=None, nrows=4):
     clipped_imgs = []
     for img in imgs:
         clipped_imgs.append(prepare_for_plot(img))
@@ -89,7 +89,8 @@ def plot_image_grid(imgs, titles, nrows=4):
         for j, ax in enumerate(row):
             if j * nrows + i < len(clipped_imgs):
                 ax.imshow(clipped_imgs[j * nrows + i], cmap='Greys_r', interpolation='none')
-                ax.set_title(titles[j * nrows + i])
+                if titles is not None:
+                    ax.set_title(titles[j * nrows + i])
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
     fig.tight_layout(pad=0.1)
