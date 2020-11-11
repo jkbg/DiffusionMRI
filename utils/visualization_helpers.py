@@ -81,8 +81,11 @@ def plot_image_grid(imgs, titles=None, nrows=4):
     clipped_imgs = []
     for img in imgs:
         clipped_imgs.append(prepare_for_plot(img))
+    print(len(clipped_imgs))
     ncols = ceil(len(clipped_imgs) / nrows)
+    print(ncols)
     nrows = min(nrows, len(clipped_imgs))
+    print(nrows)
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(ncols * 4, nrows * 5),
                              squeeze=False)
     for i, column in enumerate(axes.T):
