@@ -85,8 +85,8 @@ def plot_image_grid(imgs, titles=None, nrows=4):
     nrows = min(nrows, len(clipped_imgs))
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(ncols * 4, nrows * 5),
                              squeeze=False)
-    for i, row in enumerate(axes):
-        for j, ax in enumerate(row):
+    for i, column in enumerate(axes.T):
+        for j, ax in enumerate(column):
             if j * nrows + i < len(clipped_imgs):
                 ax.imshow(clipped_imgs[j * nrows + i], cmap='Greys_r', interpolation='none')
                 if titles is not None:
