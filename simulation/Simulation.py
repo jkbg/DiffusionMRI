@@ -8,7 +8,7 @@ from utils.visualization_helpers import load_image, rgb2gray
 
 class Simulation:
     def __init__(self,
-                 input_size=(1024,1024),
+                 input_size=(1024, 1024),
                  cropped_size=(256, 256),
                  flip=False,
                  transpose=False,
@@ -70,13 +70,13 @@ class Simulation:
         sample = {'dat': input_image, 'target': input_image.copy()}
         for t in self.transform_set:
             sample = t(sample)
-        return np.squeeze(sample['dat']), np.squeeze(sample['target'])
+        return np.transpose(sample['dat'], (1, 2, 0)), sample['target'][:, :, None]
 
 
 if __name__ == '__main__':
     image = load_image("data/raw_images/MRI_Test.png")
     image = rgb2gray(image)
-    input_size = image.shape
+    input_size = image.shape[:2]
     sim = Simulation(input_size=input_size,
                      cropped_size=(256, 256),
                      flip=False,
@@ -87,7 +87,6 @@ if __name__ == '__main__':
                      pf_factor=5,
                      mask_target=False)
     noisy_image, target_image = sim(image)
-
     fig = plt.figure(figsize=(12, 5))
     ax = fig.add_subplot(121)
     ax.imshow(noisy_image, 'gray')
