@@ -35,7 +35,8 @@ class DeepDecoder(nn.Module):
     def forward(self, x):
         for module in self.module_list:
             x = module(x)
-        return x.resize(self.number_of_output_channels, self.image_dimensions[0], self.image_dimensions[1])
+        x.resize(self.number_of_output_channels, self.image_dimensions[0], self.image_dimensions[1])
+        return x
 
     def get_input_shape(self):
         return self.input_shape
