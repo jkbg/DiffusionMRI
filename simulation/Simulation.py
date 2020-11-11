@@ -7,8 +7,18 @@ from utils.visualization_helpers import load_image, rgb2gray
 
 
 class Simulation:
-    def __init__(self, input_size, cropped_size, flip, transpose, ellipse, snr_range, noise_sigma, pf_factor,
-                 mask_target, pe_factor=1, absolute_output=True):
+    def __init__(self,
+                 input_size=(1024,1024),
+                 cropped_size=(256, 256),
+                 flip=False,
+                 transpose=False,
+                 ellipse=False,
+                 snr_range=(0, 6),
+                 noise_sigma=None,
+                 pf_factor=5,
+                 mask_target=False,
+                 pe_factor=1,
+                 absolute_output=True):
         self.transform_set = []
         if flip:
             self.transform_set.append(transforms.RandFlip(targ_op=True))
