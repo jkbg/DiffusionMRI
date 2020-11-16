@@ -77,12 +77,12 @@ def show_images(noisy_image, model_image, target_image, result_path=None, model_
         plt.show()
 
 
-def plot_image_grid(imgs, titles=None, nrows=4):
+def plot_image_grid(imgs, titles=None, ncols=4):
     clipped_imgs = []
     for img in imgs:
         clipped_imgs.append(prepare_for_plot(img))
-    ncols = ceil(len(clipped_imgs) / nrows)
-    nrows = min(nrows, len(clipped_imgs))
+    ncols = min(ncols, len(clipped_imgs))
+    nrows = ceil(len(clipped_imgs) / ncols)
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(ncols * 4, nrows * 5),
                              squeeze=False)
     for i, column in enumerate(axes.T):
