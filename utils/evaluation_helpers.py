@@ -1,11 +1,14 @@
-import numpy
+import numpy as np
 import scipy.signal
 import scipy.ndimage
-from skimage.metrics import peak_signal_noise_ratio
+
+
+def mse(a, b):
+    return (np.square(a - b)).mean(axis=None)
 
 
 def vifp_mscale(ref, dist):
-    #from https://github.com/aizvorski/video-quality/blob/master/vifp.py
+    # from https://github.com/aizvorski/video-quality/blob/master/vifp.py
 
     sigma_nsq = 2
     eps = 1e-10
@@ -49,12 +52,12 @@ def vifp_mscale(ref, dist):
         g[g < 0] = 0
         sv_sq[sv_sq <= eps] = eps
 
-        num += numpy.sum(numpy.log10(1 + g * g * sigma1_sq / (sv_sq + sigma_nsq)))
-        den += numpy.sum(numpy.log10(1 + sigma1_sq / sigma_nsq))
+        num += np.sum(np.log10(1 + g * g * sigma1_sq / (sv_sq + sigma_nsq)))
+        den += np.sum(np.log10(1 + sigma1_sq / sigma_nsq))
 
     vifp = num / den
 
-    if numpy.isnan(vifp):
+    if np.isnan(vifp):
         return 1.0
     else:
         return vifp

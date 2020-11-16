@@ -1,8 +1,12 @@
-import numpy as np
-
 from skimage.metrics import peak_signal_noise_ratio
+from utils.evaluation_helpers import vifp_mscale, mse
 
-from utils.evaluation_helpers import vifp_mscale
+
+def generate_rudimentary_result(model_parameters, noisy_image, model_image, target_image):
+    loss_wrt_target = mse(target_image, model_image)
+    best_loss_wrt_noisy = mse(noisy_image, model_image)
+    return Result(model_parameters, noisy_image, model_image, target_image, loss_wrt_target, 0, best_loss_wrt_noisy)
+
 
 
 class Result:
