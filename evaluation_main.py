@@ -3,7 +3,7 @@ import glob
 from matplotlib import pyplot as plt
 from skimage.metrics import peak_signal_noise_ratio
 
-from utils.visualization_helpers import plot_image_grid, rgb2gray
+from utils.image_helpers import plot_image_grid, rgb2gray
 from utils.evaluation_helpers import vifp_mscale
 
 

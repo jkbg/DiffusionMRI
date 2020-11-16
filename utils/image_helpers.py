@@ -1,5 +1,5 @@
 from math import ceil
-
+from torchvision import datasets, transforms
 import numpy as np
 from matplotlib import pyplot as plt
 import torch
@@ -95,3 +95,22 @@ def plot_image_grid(imgs, titles=None, nrows=4):
             ax.get_yaxis().set_visible(False)
     fig.tight_layout(pad=0.1)
     return fig
+
+
+def get_images(path, max_amount):
+    transform = transforms.Compose([transforms.Grayscale(num_output_channels=1),
+                                    transforms.RandomResizedCrop(size=256, scale=(1.0, 1.0), ratio=(1.0, 1.0)),
+                                    transforms.ToTensor()])
+
+    image_dataset = datasets.ImageFolder(root=path, transform=transform)
+    print('Number of Images:', len(image_dataset))
+
+    image_data_loader = torch.utils.data.DataLoader(image_dataset, batch_size=1, shuffle=True)
+    data_iter = iter(image_data_loader)
+    new_images = []
+    for _ in range(max_amount):
+        try:
+            new_images.append(tensor_to_image(next(data_iter)[0][0, ...]))
+        except StopIteration:
+            break
+    return new_images

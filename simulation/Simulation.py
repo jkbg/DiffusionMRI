@@ -3,7 +3,7 @@ import simulation.dldegibbs as transforms
 
 from matplotlib import pyplot as plt
 
-from utils.visualization_helpers import load_image, rgb2gray, plot_image_grid
+from utils.image_helpers import load_image, rgb2gray, plot_image_grid
 
 
 class Simulation:

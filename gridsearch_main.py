@@ -2,7 +2,7 @@ from fitting.Fitter import create_fitter_from_configuration
 from models.model_creation import create_model_from_parameter_combination
 from utils.configuration_parser.gridsearch_configuration import get_gridsearch_configuration
 from utils.pickle_utils import save_gridsearch_result
-from utils.visualization_helpers import load_images
+from utils.image_helpers import load_images
 
 if __name__ == '__main__':
     gridsearch_configuration = get_gridsearch_configuration()

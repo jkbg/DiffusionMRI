@@ -3,7 +3,7 @@ import numpy as np
 import copy
 
 from fitting.Result import Result
-from utils.visualization_helpers import image_to_tensor, tensor_to_image
+from utils.image_helpers import image_to_tensor, tensor_to_image
 
 
 def create_fitter_from_configuration(fit_model_configuration):

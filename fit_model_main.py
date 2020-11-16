@@ -1,5 +1,5 @@
 from utils.configuration_parser.fit_model_configuration import get_fit_model_configuration
-from utils.visualization_helpers import show_images, load_images
+from utils.image_helpers import show_images, load_images
 from models.model_creation import create_model_from_configuration
 from fitting.Fitter import create_fitter_from_configuration
 
