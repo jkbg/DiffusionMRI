@@ -107,10 +107,10 @@ def get_images(path, max_amount):
 
     image_data_loader = torch.utils.data.DataLoader(image_dataset, batch_size=1, shuffle=True)
     data_iter = iter(image_data_loader)
-    new_images = []
+    images = []
     for _ in range(max_amount):
         try:
-            new_images.append(tensor_to_image(next(data_iter)[0][0, ...]))
+            images.append(tensor_to_image(next(data_iter)[0][0, ...]))
         except StopIteration:
             break
-    return new_images
+    return [np.squeeze(image) for image in images]
