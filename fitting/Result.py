@@ -8,7 +8,6 @@ def generate_rudimentary_result(model_parameters, noisy_image, model_image, targ
     return Result(model_parameters, noisy_image, model_image, target_image, loss_wrt_target, 0, best_loss_wrt_noisy)
 
 
-
 class Result:
     def __init__(self, model_parameters, noisy_image, model_image, target_image, loss_wrt_target, number_of_iterations,
                  best_loss_wrt_noisy):
@@ -27,5 +26,5 @@ class Result:
         output_string += ", "
         output_string += str(self.number_of_iterations)
         output_string += ", "
-        output_string += self.model_parameters
+        output_string += str(self.model_parameters)
         return output_string

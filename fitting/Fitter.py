@@ -127,5 +127,5 @@ class Fitter:
                         target_image=tensor_to_image(self.target_image.cpu()),
                         loss_wrt_target=self.get_final_target_loss().item(),
                         number_of_iterations=self.step_counter,
-                        best_loss_wrt_noisy=self.best_model_loss)
+                        best_loss_wrt_noisy=self.best_model_loss.cpu())
         return result
