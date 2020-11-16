@@ -72,6 +72,15 @@ class Simulation:
             sample = t(sample)
         return np.transpose(sample['dat'], (1, 2, 0)), sample['target'][:, :, None]
 
+    def simulate_list_of_images(self, original_images):
+        noisy_images = []
+        target_images = []
+        for original_image in original_images:
+            noisy_image, target_image = self(original_image)
+            noisy_images.append(noisy_image)
+            target_images.append(target_image)
+        return noisy_images, target_images
+
 
 if __name__ == '__main__':
     diagonal_image = load_image("data/raw_images/MRI_Test.png")
