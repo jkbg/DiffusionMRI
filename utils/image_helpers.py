@@ -103,7 +103,7 @@ def get_images(path, max_amount):
                                     transforms.ToTensor()])
 
     image_dataset = datasets.ImageFolder(root=path, transform=transform)
-    print('Number of Images:', len(image_dataset))
+    print('Number of Images:', len(image_dataset), 'in', path)
 
     image_data_loader = torch.utils.data.DataLoader(image_dataset, batch_size=1, shuffle=True)
     data_iter = iter(image_data_loader)
