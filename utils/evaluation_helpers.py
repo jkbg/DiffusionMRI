@@ -69,7 +69,7 @@ def calculate_model_performances(results):
     performances = []
     for model_results in splitted_results:
         performance = generate_performance(description=str(model_results[0].model_parameters),
-                                           mse_noisy=np.mean([x.best_loss_wrt_noisy.cpu() for x in model_results]),
+                                           mse_noisy=np.mean([x.best_loss_wrt_noisy for x in model_results]),
                                            mse_target=np.mean([x.loss_wrt_target for x in model_results]),
                                            psnr=np.mean([x.psnr for x in model_results]),
                                            vif=np.mean([x.vif for x in model_results]))
