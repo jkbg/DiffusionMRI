@@ -63,22 +63,20 @@ def vifp_mscale(ref, dist):
         return vifp
 
 
-def get_average_results_per_parameter_combination(results):
+def get_average_performance_per_parameter_combination(results):
     # Generate list containing every parameter combination once
     models = list(map(lambda x: str(x.model_parameters), results))
     models = list(dict.fromkeys(models))
     models.sort()
 
     # Average Performance Indicators for each model setup
-    average_results = []
+    average_performances = []
     for model in models:
         model_results = list(filter(lambda x: str(x.model_parameters) == model, results))
-        average_result = {'model_parameters': model,
+        average_performance = {'model_parameters': model,
                           'mse_noisy': np.mean([x.best_loss_wrt_noisy.cpu() for x in model_results]),
                           'mse_target': np.mean([x.loss_wrt_target for x in model_results]),
                           'vif': np.mean([x.vif for x in model_results]),
                           'psnr': np.mean([x.psnr for x in model_results])}
-        average_results.append(average_result)
-    return average_results
-
-
+        average_performances.append(average_performance)
+    return average_performances
