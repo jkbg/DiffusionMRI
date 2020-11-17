@@ -108,7 +108,7 @@ def calculate_combined_performances(results, combine_function=lambda x: np.mean(
 def filter_duplicates(list):
     filtered_list = []
     for element in list:
-        if all(element) not in filtered_list:
+        if not any([np.array_equal(element, x) for x in filtered_list]):
             filtered_list.append(element)
     return filtered_list
 
@@ -176,6 +176,8 @@ class Test:
 
 
 if __name__ == '__main__':
-    results = [Test('a', 1), Test('a', 2), Test('a', 3), Test('b', 1), Test('b', 2), Test('b', 3), Test('c', 2)]
-    splitted_results = split_result_list(results, model_split=True, image_split=False)
-    print(splitted_results)
+    # results = [Test('a', 1), Test('a', 2), Test('a', 3), Test('b', 1), Test('b', 2), Test('b', 3), Test('c', 2)]
+    # splitted_results = split_result_list(results, model_split=True, image_split=False)
+    test_list = [np.array((1, 2)), np.array((1, 2)), np.array((1, 3)), np.array((1, 3)), np.array((2, 5))]
+    test_list = ['a', 'a', 'b']
+    print(filter_duplicates(test_list))
