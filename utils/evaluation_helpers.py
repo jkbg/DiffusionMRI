@@ -124,7 +124,7 @@ def split_result_list(results, model_split=True, image_split=False):
         for results_per_model in splitted_result_list:
             noisy_images_used = get_noisy_images_used(results_per_model)
             for noisy_image in noisy_images_used:
-                results_per_image = list(filter(lambda x: x.noisy_image == noisy_image, results_per_model))
+                results_per_image = list(filter(lambda x: np.array_equal(x.noisy_image, noisy_image), results_per_model))
                 further_splitted_result_list.append(results_per_image)
     else:
         further_splitted_result_list = splitted_result_list
