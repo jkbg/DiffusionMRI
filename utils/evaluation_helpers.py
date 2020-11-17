@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.signal
 import scipy.ndimage
+from skimage.metrics import peak_signal_noise_ratio
 
 
 def mse(a, b):
@@ -74,9 +75,21 @@ def get_average_performance_per_parameter_combination(results):
     for model in models:
         model_results = list(filter(lambda x: str(x.model_parameters) == model, results))
         average_performance = {'model_parameters': model,
-                          'mse_noisy': np.mean([x.best_loss_wrt_noisy.cpu() for x in model_results]),
-                          'mse_target': np.mean([x.loss_wrt_target for x in model_results]),
-                          'vif': np.mean([x.vif for x in model_results]),
-                          'psnr': np.mean([x.psnr for x in model_results])}
+                               'mse_noisy': np.mean([x.best_loss_wrt_noisy.cpu() for x in model_results]),
+                               'mse_target': np.mean([x.loss_wrt_target for x in model_results]),
+                               'vif': np.mean([x.vif for x in model_results]),
+                               'psnr': np.mean([x.psnr for x in model_results])}
         average_performances.append(average_performance)
     return average_performances
+
+
+def calculate_average_noisy_performance(results):
+    # Generate list containing every noisy_image once
+    images = list(map(lambda x: (x.noisy_image, x.target_image), results))
+    images = list(set(images))
+
+    # Average Performance Indicators for each model setup
+    average_performance = {'mse_target': np.mean([mse(x[0], x[1]) for x in images]),
+                           'vif': np.mean([vifp_mscale(x[1], x[0]) for x in images]),
+                           'psnr': np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in images])}
+    return average_performance
