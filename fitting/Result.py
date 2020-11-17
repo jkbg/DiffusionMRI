@@ -5,7 +5,7 @@ from utils.evaluation_helpers import vifp_mscale, mse, split_result_list
 
 def generate_rudimentary_result(model_parameters, noisy_image, model_image, target_image):
     loss_wrt_target = mse(target_image, model_image)
-    best_loss_wrt_noisy = mse(noisy_image, model_image)
+    best_loss_wrt_noisy = mse(noisy_image, model_image).cuda()
     return Result(model_parameters, noisy_image, model_image, target_image, loss_wrt_target, 0, best_loss_wrt_noisy)
 
 
