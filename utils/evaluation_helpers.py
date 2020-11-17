@@ -3,6 +3,8 @@ import scipy.signal
 import scipy.ndimage
 from skimage.metrics import peak_signal_noise_ratio
 
+from fitting.Result import generate_rudimentary_result
+
 
 def mse(a, b):
     return (np.square(a - b)).mean(axis=None)
@@ -86,23 +88,20 @@ def calculate_noisy_performance(results):
     return performance
 
 
-def calculate_combined_performances(results, combine_function=lambda x: np.mean(x, axis=0), include_noisy=False):
+def calculate_combination_results(results, combine_function=lambda x: np.mean(x, axis=0), include_noisy=False):
     splitted_results = split_result_list(results, split_model=True, split_image=True)
-    performances = []
+    combination_results = []
     for run_results in splitted_results:
         noisy_image = run_results[0].noisy_image
         target_image = run_results[0].target_image
+        model_parameters = run_results[0].model_parameters
         images_to_combine = [x.model_image for x in run_results]
         if include_noisy:
             images_to_combine.append(noisy_image)
         combined_image = combine_function(images_to_combine)
-        performance = generate_performance(description=str(run_results[0].model_parameters) + 'C',
-                                           mse_noisy=mse(noisy_image, combined_image),
-                                           mse_target=mse(target_image, combined_image),
-                                           vif=vifp_mscale(target_image, combined_image),
-                                           psnr=peak_signal_noise_ratio(target_image, combined_image))
-        performance.append(performance)
-    return performances
+        result = generate_rudimentary_result(model_parameters, noisy_image, combined_image, target_image)
+        combination_results.append(result)
+    return combination_results
 
 
 def filter_duplicates(list):
