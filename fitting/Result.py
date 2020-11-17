@@ -31,7 +31,7 @@ class Result:
 
 
 def calculate_combination_results(results, combine_function=lambda x: np.mean(x, axis=0), include_noisy=False):
-    splitted_results = split_result_list(results, split_model=True, split_image=True)
+    splitted_results = split_result_list(results, model_split=True, image_split=True)
     combination_results = []
     for run_results in splitted_results:
         noisy_image = run_results[0].noisy_image
