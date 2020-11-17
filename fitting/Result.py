@@ -1,5 +1,5 @@
 from skimage.metrics import peak_signal_noise_ratio
-from utils.evaluation_helpers import vifp_mscale, mse
+from utils.evaluation_helpers import vifp_mscale, mse, split_result_list
 
 
 def generate_rudimentary_result(model_parameters, noisy_image, model_image, target_image):
@@ -28,3 +28,19 @@ class Result:
         output_string += ", "
         output_string += str(self.model_parameters)
         return output_string
+
+
+def calculate_combination_results(results, combine_function=lambda x: np.mean(x, axis=0), include_noisy=False):
+    splitted_results = split_result_list(results, split_model=True, split_image=True)
+    combination_results = []
+    for run_results in splitted_results:
+        noisy_image = run_results[0].noisy_image
+        target_image = run_results[0].target_image
+        model_parameters = run_results[0].model_parameters
+        images_to_combine = [x.model_image for x in run_results]
+        if include_noisy:
+            images_to_combine.append(noisy_image)
+        combined_image = combine_function(images_to_combine)
+        result = generate_rudimentary_result(model_parameters, noisy_image, combined_image, target_image)
+        combination_results.append(result)
+    return combination_results

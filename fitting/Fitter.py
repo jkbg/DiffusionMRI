@@ -115,7 +115,7 @@ class Fitter:
         return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())
 
     def get_final_target_loss(self):
-        return self.loss_fn(self.best_model(self.fixed_net_input).detach(), self.target_image).data
+        return self.loss_fn(self.best_model(self.fixed_net_input).detach(), self.target_image)
 
     def get_step_counter(self):
         return self.step_counter
@@ -125,7 +125,7 @@ class Fitter:
                         noisy_image=tensor_to_image(self.noisy_image.cpu()),
                         model_image=self.get_best_image(),
                         target_image=tensor_to_image(self.target_image.cpu()),
-                        loss_wrt_target=self.get_final_target_loss().item(),
+                        loss_wrt_target=self.get_final_target_loss().cpu().item(),
                         number_of_iterations=self.step_counter,
                         best_loss_wrt_noisy=self.best_model_loss.cpu())
         return result

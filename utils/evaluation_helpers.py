@@ -3,8 +3,6 @@ import scipy.signal
 import scipy.ndimage
 from skimage.metrics import peak_signal_noise_ratio
 
-from fitting.Result import generate_rudimentary_result
-
 
 def mse(a, b):
     return (np.square(a - b)).mean(axis=None)
@@ -86,22 +84,6 @@ def calculate_noisy_performance(results):
                                        vif=np.mean([vifp_mscale(x[1], x[0]) for x in given_image_pairs]),
                                        psnr=np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in given_image_pairs]))
     return performance
-
-
-def calculate_combination_results(results, combine_function=lambda x: np.mean(x, axis=0), include_noisy=False):
-    splitted_results = split_result_list(results, split_model=True, split_image=True)
-    combination_results = []
-    for run_results in splitted_results:
-        noisy_image = run_results[0].noisy_image
-        target_image = run_results[0].target_image
-        model_parameters = run_results[0].model_parameters
-        images_to_combine = [x.model_image for x in run_results]
-        if include_noisy:
-            images_to_combine.append(noisy_image)
-        combined_image = combine_function(images_to_combine)
-        result = generate_rudimentary_result(model_parameters, noisy_image, combined_image, target_image)
-        combination_results.append(result)
-    return combination_results
 
 
 def filter_duplicates(list):
