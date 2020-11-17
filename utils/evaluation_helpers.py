@@ -104,10 +104,11 @@ def calculate_combined_performances(results, combine_function=lambda x: np.mean(
         performance.append(performance)
     return performances
 
+
 def filter_duplicates(list):
     filtered_list = []
     for element in list:
-        if element not in filtered_list:
+        if all(element) not in filtered_list:
             filtered_list.append(element)
     return filtered_list
 
