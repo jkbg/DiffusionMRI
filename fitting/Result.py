@@ -31,17 +31,19 @@ class Result:
         return output_string
 
 
-def calculate_combination_results(results, combine_function=lambda x: np.mean(x, axis=0), include_noisy=False):
+def average_images_from_results(results):
+    images_to_combine = [x.model_image for x in results]
+    return np.mean(images_to_combine, axis=0)
+
+
+def calculate_combination_results(results, image_from_results=average_images_from_results):
     splitted_results = split_result_list(results, model_split=True, image_split=True)
     combination_results = []
     for run_results in splitted_results:
         noisy_image = run_results[0].noisy_image
         target_image = run_results[0].target_image
         model_parameters = run_results[0].model_parameters
-        images_to_combine = [x.model_image for x in run_results]
-        if include_noisy:
-            images_to_combine.append(noisy_image)
-        combined_image = combine_function(images_to_combine)
+        combined_image = image_from_results(run_results)
         result = generate_rudimentary_result(model_parameters, noisy_image, combined_image, target_image)
         combination_results.append(result)
     return combination_results
