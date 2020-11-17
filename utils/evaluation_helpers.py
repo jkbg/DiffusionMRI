@@ -86,7 +86,7 @@ def get_average_performance_per_parameter_combination(results):
 def calculate_average_noisy_performance(results):
     # Generate list containing every noisy_image once
     images = list(map(lambda x: (x.noisy_image, x.target_image), results))
-    images = list(set(images))
+    images = np.unique(np.array(images), axis=0)
 
     # Average Performance Indicators for each model setup
     average_performance = {'mse_target': np.mean([mse(x[0], x[1]) for x in images]),
