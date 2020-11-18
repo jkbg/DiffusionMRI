@@ -194,7 +194,7 @@ def logistic_differentiation(x, alpha, beta, gamma):
     return alpha * np.exp((x - beta) / gamma) / (gamma * (1. + np.exp((x - beta) / gamma)) ** 2)
 
 
-def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None):
+def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None, max_iter=1000):
     number_of_pixels = len(row)
     x = np.linspace(0, number_of_pixels, num=number_of_pixels * accuracy_factor)
     if estimated_parameters is None:
@@ -205,11 +205,11 @@ def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_
     (a1, a2, a3, b1, b2, b3, g1, g2, g3, c), _ = opt.curve_fit(logistic_sum,
                                                                np.arange(number_of_pixels),
                                                                row,
-                                                               p0=estimated_parameters)
+                                                               p0=estimated_parameters,
+                                                               max_nfev=max_iter)
     alphas = [a1, a2, a3]
     betas = [b1, b2, b3]
     gammas = [g1, g2, g3]
-    print(alphas, betas, gammas)
     fitted_row = logistic_sum(x, *alphas, *betas, *gammas, c)
     differences = -np.diff(fitted_row)
     half_max = np.max(differences)/2.
