@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.signal
 import scipy.ndimage
+import scipy.optimize as opt
 from skimage.metrics import peak_signal_noise_ratio
 
 
@@ -162,25 +163,54 @@ def split_performances(performances, split_type='number_of_channels'):
     all_types = list(map(lambda x: x['description'][index], performances))
     unique_types = filter_duplicates(all_types)
     for unique_type in unique_types:
-        performances_per_type = list(filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
+        performances_per_type = list(
+            filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
         performances_split_per_type[str(unique_type)] = performances_per_type
     return performances_split_per_type
 
 
-if __name__ == '__main__':
-    performances = []
-    description = ['deep', [10, 10], 2, 64]
-    performances.append({'description': description})
-    description = ['deep', [12, 12], 2, 64]
-    performances.append({'description': description})
-    description = ['deep', [10, 10], 4, 64]
-    performances.append({'description': description})
-    description = ['deep', [10, 10], 2, 128]
-    performances.append({'description': description})
-    description = ['conv', [10, 10], 2, 32]
-    performances.append({'description': description})
-    description = ['deep', [10, 10], 2, 32]
-    performances.append({'description': description})
+def logistic_function(x, alpha, beta, gamma):
+    return alpha / (1. + np.exp((x - beta) / gamma))
 
-    splitted_performances = split_performances(performances, 'number_of_channels')
-    print(splitted_performances)
+
+def logistic_sum(x, a1, a2, a3, b1, b2, b3, g1, g2, g3, c):
+    alphas = [a1, a2, a3]
+    betas = [b1, b2, b3]
+    gammas = [g1, g2, g3]
+    out = 0.0
+    for (alpha, beta, gamma) in zip(alphas, betas, gammas):
+        out += logistic_function(x, alpha, beta, gamma)
+    out += c
+    return out
+
+
+def logistic_sum_differentiation(x, alphas, betas, gammas):
+    out = 0.0
+    for (alpha, beta, gamma) in zip(alphas, betas, gammas):
+        out += logistic_differentiation(x, alpha, beta, gamma)
+    return out
+
+
+def logistic_differentiation(x, alpha, beta, gamma):
+    return alpha * np.exp((x - beta) / gamma) / (gamma * (1. + np.exp((x - beta) / gamma)) ** 2)
+
+
+def calculate_full_width_half_maximum_value(row, accuracy_factor=100):
+    number_of_pixels = len(row)
+    x = np.linspace(0, number_of_pixels, num=number_of_pixels * accuracy_factor)
+    estimated_parameters = [0.3, 0.3, 0.3,
+                            number_of_pixels / 2., number_of_pixels / 2., number_of_pixels / 2.,
+                            1., 1., 1.,
+                            0]
+    (a1, a2, a3, b1, b2, b3, g1, g2, g3, c), _ = opt.curve_fit(logistic_sum,
+                                                               np.arange(number_of_pixels),
+                                                               row,
+                                                               p0=estimated_parameters)
+    alphas = [a1, a2, a3]
+    betas = [b1, b2, b3]
+    gammas = [g1, g2, g3]
+    fitted_row = logistic_sum(x, *alphas, *betas, *gammas, c)
+    differences = -np.diff(fitted_row)
+    half_max = np.max(differences)/2.
+    indices = np.where(np.diff(np.sign(differences - half_max)))[0]
+    return (indices[-1] - indices[0])/accuracy_factor, fitted_row
