@@ -163,7 +163,7 @@ def split_performances(performances, split_type='number_of_channels'):
     unique_types = filter_duplicates(all_types)
     for unique_type in unique_types:
         performances_per_type = list(filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
-        performances_split_per_type[unique_type] = performances_per_type
+        performances_split_per_type[str(unique_type)] = performances_per_type
     return performances_split_per_type
 
 
