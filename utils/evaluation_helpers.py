@@ -206,7 +206,7 @@ def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_
                                                                np.arange(number_of_pixels),
                                                                row,
                                                                p0=estimated_parameters,
-                                                               max_nfev=max_iter)
+                                                               maxfev=max_iter)
     alphas = [a1, a2, a3]
     betas = [b1, b2, b3]
     gammas = [g1, g2, g3]
