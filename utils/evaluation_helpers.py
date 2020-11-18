@@ -162,23 +162,25 @@ def split_performances(performances, split_type='number_of_channels'):
     all_types = list(map(lambda x: x['description'][index], performances))
     unique_types = filter_duplicates(all_types)
     for unique_type in unique_types:
-        performances_per_type = list(filter(lambda x: x['description'][index] == unique_type, performances))
+        performances_per_type = list(filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
         performances_split_per_type[unique_type] = performances_per_type
     return performances_split_per_type
 
 
-class Test:
-    def __init__(self, model_parameters, noisy_image):
-        self.model_parameters = model_parameters
-        self.noisy_image = noisy_image
-
-    def __str__(self):
-        return str(self.model_parameters) + ' ' + str(self.noisy_image)
-
-
 if __name__ == '__main__':
-    # results = [Test('a', 1), Test('a', 2), Test('a', 3), Test('b', 1), Test('b', 2), Test('b', 3), Test('c', 2)]
-    # splitted_results = split_result_list(results, model_split=True, image_split=False)
-    test_list = [np.array((1, 2)), np.array((1, 2)), np.array((1, 3)), np.array((1, 3)), np.array((2, 5))]
-    test_list = ['a', 'a', 'b']
-    print(filter_duplicates(test_list))
+    performances = []
+    description = ['deep', [10, 10], 2, 64]
+    performances.append({'description': description})
+    description = ['deep', [12, 12], 2, 64]
+    performances.append({'description': description})
+    description = ['deep', [10, 10], 4, 64]
+    performances.append({'description': description})
+    description = ['deep', [10, 10], 2, 128]
+    performances.append({'description': description})
+    description = ['conv', [10, 10], 2, 32]
+    performances.append({'description': description})
+    description = ['deep', [10, 10], 2, 32]
+    performances.append({'description': description})
+
+    splitted_performances = split_performances(performances, 'number_of_channels')
+    print(splitted_performances)
