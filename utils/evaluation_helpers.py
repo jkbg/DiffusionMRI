@@ -124,7 +124,8 @@ def split_result_list(results, model_split=True, image_split=False):
         for results_per_model in splitted_result_list:
             noisy_images_used = get_noisy_images_used(results_per_model)
             for noisy_image in noisy_images_used:
-                results_per_image = list(filter(lambda x: np.array_equal(x.noisy_image, noisy_image), results_per_model))
+                results_per_image = list(
+                    filter(lambda x: np.array_equal(x.noisy_image, noisy_image), results_per_model))
                 further_splitted_result_list.append(results_per_image)
     else:
         further_splitted_result_list = splitted_result_list
@@ -145,6 +146,25 @@ def generate_performance(description=None, mse_noisy=None, mse_target=None, psnr
     if vif is not None:
         performance['vif'] = vif
     return performance
+
+
+def split_performances(performances, split_type='number_of_channels'):
+    performances_split_per_type = {}
+    index = 0
+    if split_type == 'model_type':
+        index = 0
+    elif split_type == 'input_shape':
+        index = 1
+    elif split_type == 'number_of_layers':
+        index = 2
+    elif split_type == 'number_of_channels':
+        index = 3
+    all_types = list(map(lambda x: x['description'][index], performances))
+    unique_types = filter_duplicates(all_types)
+    for unique_type in unique_types:
+        performances_per_type = list(filter(lambda x: x['description'][index] == unique_type, performances))
+        performances_split_per_type[unique_type] = performances_per_type
+    return performances_split_per_type
 
 
 class Test:
