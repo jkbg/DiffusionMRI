@@ -4,7 +4,6 @@ import scipy.ndimage
 import scipy.optimize as opt
 from skimage.metrics import peak_signal_noise_ratio
 
-
 def mse(a, b):
     return (np.square(a - b)).mean(axis=None)
 
@@ -195,13 +194,14 @@ def logistic_differentiation(x, alpha, beta, gamma):
     return alpha * np.exp((x - beta) / gamma) / (gamma * (1. + np.exp((x - beta) / gamma)) ** 2)
 
 
-def calculate_full_width_half_maximum_value(row, accuracy_factor=100):
+def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None):
     number_of_pixels = len(row)
     x = np.linspace(0, number_of_pixels, num=number_of_pixels * accuracy_factor)
-    estimated_parameters = [0.3, 0.3, 0.3,
-                            number_of_pixels / 2., number_of_pixels / 2., number_of_pixels / 2.,
-                            1., 1., 1.,
-                            0]
+    if estimated_parameters is None:
+        estimated_parameters = [0.3, 0.3, 0.3,
+                                number_of_pixels / 2., number_of_pixels / 2., number_of_pixels / 2.,
+                                1., 1., 1.,
+                                0]
     (a1, a2, a3, b1, b2, b3, g1, g2, g3, c), _ = opt.curve_fit(logistic_sum,
                                                                np.arange(number_of_pixels),
                                                                row,
@@ -209,6 +209,7 @@ def calculate_full_width_half_maximum_value(row, accuracy_factor=100):
     alphas = [a1, a2, a3]
     betas = [b1, b2, b3]
     gammas = [g1, g2, g3]
+    print(alphas, betas, gammas)
     fitted_row = logistic_sum(x, *alphas, *betas, *gammas, c)
     differences = -np.diff(fitted_row)
     half_max = np.max(differences)/2.
