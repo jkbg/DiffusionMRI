@@ -4,6 +4,7 @@ import scipy.ndimage
 import scipy.optimize as opt
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
+
 def mse(a, b):
     return (np.square(a - b)).mean(axis=None)
 
@@ -84,7 +85,9 @@ def calculate_noisy_performance(results):
                                        mse_target=np.mean([mse(x[0], x[1]) for x in given_image_pairs]),
                                        vif=np.mean([vifp_mscale(x[1], x[0]) for x in given_image_pairs]),
                                        psnr=np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in given_image_pairs]),
-                                       ssim=np.mean([structural_similarity(x[1], x[0], multichannel=True, data_range=np.max(x[1])) for x in given_image_pairs]))
+                                       ssim=np.mean([structural_similarity(x[1], x[0], multichannel=True,
+                                                                           data_range=np.max(x[1])) for x in
+                                                     given_image_pairs]))
     return performance
 
 
@@ -198,7 +201,7 @@ def logistic_differentiation(x, alpha, beta, gamma):
     return alpha * np.exp((x - beta) / gamma) / (gamma * (1. + np.exp((x - beta) / gamma)) ** 2)
 
 
-def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None, max_iter=1000, ):
+def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None, max_iter=1000):
     number_of_pixels = len(row)
     x = np.linspace(0, number_of_pixels, num=number_of_pixels * accuracy_factor)
     if estimated_parameters is None:
@@ -216,6 +219,6 @@ def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_
     gammas = [g1, g2, g3]
     fitted_row = logistic_sum(x, *alphas, *betas, *gammas, c)
     differences = -np.diff(fitted_row)
-    half_max = np.max(differences)/2.
+    half_max = np.max(differences) / 2.
     indices = np.where(np.diff(np.sign(differences - half_max)))[0]
-    return (indices[-1] - indices[0])/accuracy_factor, fitted_row
+    return (indices[-1] - indices[0]) / accuracy_factor, fitted_row

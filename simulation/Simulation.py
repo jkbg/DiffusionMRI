@@ -15,7 +15,7 @@ class Simulation:
                  ellipse=False,
                  snr_range=(0, 6),
                  noise_sigma=None,
-                 pf_factor=5,
+                 pf_factor=8,
                  mask_target=False,
                  pe_factor=1,
                  absolute_output=True,
