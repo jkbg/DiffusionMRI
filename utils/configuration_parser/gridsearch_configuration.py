@@ -24,6 +24,7 @@ def parse_command_line_arguments():
     parser.add_argument('--convergence-check-length', type=int, default=100)
     parser.add_argument('--log-frequency', type=int, default=1)
     parser.add_argument('--find-best', type=bool, default=True)
+    parser.add_argument('--save-losses', type=bool, default=False)
     parser.add_argument('--cpu', action='store_true')
     parsed_arguments, non_parsed_arguments = parser.parse_known_args()
     return parsed_arguments
@@ -46,6 +47,7 @@ class GridsearchConfiguration:
         self.convergence_check_length = command_line_arguments.convergence_check_length
         self.log_frequency = command_line_arguments.log_frequency
         self.find_best = command_line_arguments.find_best
+        self.save_losses = command_line_arguments.save_losses
 
         self.parameter_combinations = []
 

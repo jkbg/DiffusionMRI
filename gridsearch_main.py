@@ -6,7 +6,7 @@ from utils.image_helpers import load_images
 
 if __name__ == '__main__':
     gridsearch_configuration = get_gridsearch_configuration()
-    noisy_image, target_image = load_images(['data/raw_images/canonical_noisy.png', 'data/raw_images/canonical_target.png'])
+    noisy_image, target_image = load_images(['data/raw_images/sample_images/cameraman.png', 'data/raw_images/sample_images/cameraman.png'])
     fitter = create_fitter_from_configuration(gridsearch_configuration)
     parameter_combinations = gridsearch_configuration.generate_parameter_combinations()
     for parameter_combination in parameter_combinations:

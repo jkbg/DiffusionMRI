@@ -12,13 +12,14 @@ def create_fitter_from_configuration(fit_model_configuration):
                     convergence_check_length=fit_model_configuration.convergence_check_length,
                     log_frequency=fit_model_configuration.log_frequency,
                     find_best=fit_model_configuration.find_best,
-                    data_type=fit_model_configuration.data_type)
+                    data_type=fit_model_configuration.data_type,
+                    save_losses=fit_model_configuration.save_losses)
     return fitter
 
 
 class Fitter:
     def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=40, log_frequency=10,
-                 find_best=False, data_type=torch.FloatTensor):
+                 find_best=False, data_type=torch.FloatTensor, save_losses=False):
         self.loss_fn = torch.nn.MSELoss().type(data_type)
         self.number_of_iterations = number_of_iterations
         self.learning_rate = learning_rate
@@ -26,8 +27,9 @@ class Fitter:
         self.log_frequency = log_frequency
         self.find_best = find_best
         self.data_type = data_type
+        self.save_losses = save_losses
 
-    def __call__(self, model, original_image, target_image=None):
+    def __call__(self, model, original_image, target_image):
         self.model = model.type(self.data_type)
         self.optimizer = torch.optim.Adam(model.parameters(), lr=self.learning_rate)
         self.step_counter = 0
@@ -38,8 +40,11 @@ class Fitter:
         self.best_model = copy.deepcopy(self.model)
         self.best_model_step = 0
         self.best_model_loss = 1000
-        self.losses_wrt_noisy = []
-        self.losses_wrt_target = []
+        if self.save_losses:
+            self.losses_wrt_noisy = []
+            self.losses_wrt_target = []
+        self.current_loss_wrt_noisy = 1000
+        self.current_loss_wrt_target = 1000
         return self.fit()
 
     def fit(self):
@@ -73,10 +78,14 @@ class Fitter:
         return True
 
     def update_loss_metrics_and_best_model(self, current_loss_wrt_noisy, current_output):
-        self.losses_wrt_noisy.append(current_loss_wrt_noisy.data)
+        self.current_loss_wrt_noisy = current_loss_wrt_noisy.data
+        if self.save_losses:
+            self.losses_wrt_noisy.append(self.current_loss_wrt_noisy)
         if self.target_image is not None:
             current_loss_wrt_target = self.loss_fn(current_output, self.target_image)
-            self.losses_wrt_target.append(current_loss_wrt_target.data)
+            self.current_loss_wrt_target = current_loss_wrt_target.data
+            if self.save_losses:
+                self.losses_wrt_target.append(self.current_loss_wrt_target.data)
 
         if self.find_best:
             if self.step_counter > 0:
@@ -98,10 +107,9 @@ class Fitter:
     def log(self):
         log_string = f"Step: {self.step_counter:05d}"
         log_string += ", "
-        log_string += f"Loss: {self.losses_wrt_noisy[-1]:.6f}"
-        if len(self.losses_wrt_target) > 0:
-            log_string += ", "
-            log_string += f"Target Loss: {self.losses_wrt_target[-1]:.6f}"
+        log_string += f"Loss: {self.current_loss_wrt_noisy:.6f}"
+        log_string += ", "
+        log_string += f"Target Loss: {self.current_loss_wrt_target:.6f}"
         if self.find_best:
             log_string += ', '
             log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss:.6f}'
