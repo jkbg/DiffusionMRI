@@ -84,7 +84,7 @@ def calculate_noisy_performance(results):
                                        mse_target=np.mean([mse(x[0], x[1]) for x in given_image_pairs]),
                                        vif=np.mean([vifp_mscale(x[1], x[0]) for x in given_image_pairs]),
                                        psnr=np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in given_image_pairs]),
-                                       ssim=np.mean([structural_similarity(x[1], x[0]) for x in given_image_pairs]))
+                                       ssim=np.mean([structural_similarity(x[1], x[0], multichannel=True, data_range=np.max(x[1])) for x in given_image_pairs]))
     return performance
 
 
