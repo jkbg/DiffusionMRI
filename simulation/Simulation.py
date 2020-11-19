@@ -18,7 +18,8 @@ class Simulation:
                  pf_factor=5,
                  mask_target=False,
                  pe_factor=1,
-                 absolute_output=True):
+                 absolute_output=True,
+                 snr_logflag=True):
         self.transform_set = []
         if flip:
             self.transform_set.append(transforms.RandFlip(targ_op=True))
@@ -40,7 +41,7 @@ class Simulation:
         scale = np.prod(np.sqrt(np.array(cropped_size) / np.array(input_size)))
         self.transform_set.append(transforms.MriCrop(crop_sz=cropped_size, scale=scale))
 
-        self.transform_set.append(transforms.MriNoise(snr_range=snr_range, sigma=noise_sigma))
+        self.transform_set.append(transforms.MriNoise(snr_range=snr_range, sigma=noise_sigma, logflag=snr_logflag))
 
         mask = np.ones(shape=cropped_size)
         pe_max = np.floor(cropped_size[1] * (1 - (1 - pe_factor) / 2)).astype(np.int)
