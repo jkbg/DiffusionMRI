@@ -2,7 +2,7 @@ import numpy as np
 import scipy.signal
 import scipy.ndimage
 import scipy.optimize as opt
-from skimage.metrics import peak_signal_noise_ratio
+from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
 def mse(a, b):
     return (np.square(a - b)).mean(axis=None)
@@ -72,7 +72,8 @@ def calculate_model_performances(results):
                                            mse_noisy=np.mean([x.best_loss_wrt_noisy for x in model_results]),
                                            mse_target=np.mean([x.loss_wrt_target for x in model_results]),
                                            psnr=np.mean([x.psnr for x in model_results]),
-                                           vif=np.mean([x.vif for x in model_results]))
+                                           vif=np.mean([x.vif for x in model_results]),
+                                           ssim=np.mean([x.ssim for x in model_results]))
         performances.append(performance)
     return performances
 
@@ -82,7 +83,8 @@ def calculate_noisy_performance(results):
     performance = generate_performance(description='Average Noisy Performance',
                                        mse_target=np.mean([mse(x[0], x[1]) for x in given_image_pairs]),
                                        vif=np.mean([vifp_mscale(x[1], x[0]) for x in given_image_pairs]),
-                                       psnr=np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in given_image_pairs]))
+                                       psnr=np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in given_image_pairs]),
+                                       ssim=np.mean([structural_similarity(x[1], x[0]) for x in given_image_pairs]))
     return performance
 
 
@@ -133,7 +135,7 @@ def split_result_list(results, model_split=True, image_split=False):
     return further_splitted_result_list
 
 
-def generate_performance(description=None, mse_noisy=None, mse_target=None, psnr=None, vif=None):
+def generate_performance(description=None, mse_noisy=None, mse_target=None, psnr=None, vif=None, ssim=None):
     performance = {}
     if description is not None:
         performance['description'] = description
@@ -145,6 +147,8 @@ def generate_performance(description=None, mse_noisy=None, mse_target=None, psnr
         performance['psnr'] = psnr
     if vif is not None:
         performance['vif'] = vif
+    if ssim is not None:
+        performance['ssim'] = ssim
     return performance
 
 
@@ -194,7 +198,7 @@ def logistic_differentiation(x, alpha, beta, gamma):
     return alpha * np.exp((x - beta) / gamma) / (gamma * (1. + np.exp((x - beta) / gamma)) ** 2)
 
 
-def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None, max_iter=1000):
+def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None, max_iter=1000, ):
     number_of_pixels = len(row)
     x = np.linspace(0, number_of_pixels, num=number_of_pixels * accuracy_factor)
     if estimated_parameters is None:
