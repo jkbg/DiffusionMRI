@@ -67,7 +67,7 @@ class Simulation:
         self.transform_set.append(transforms.MriResize(output_sz=cropped_size, targ_op=True, dat_op=False))
 
     def __call__(self, input_image):
-        sample = {'dat': input_image, 'target': input_image.copy()}
+        sample = {'dat': input_image, 'target': input_image.copy(), 'siglevel': np.mean(input_image)}
         for t in self.transform_set:
             sample = t(sample)
         return np.transpose(sample['dat'], (1, 2, 0)), sample['target'][:, :, None]
@@ -83,12 +83,11 @@ class Simulation:
 
 
 if __name__ == '__main__':
-    diagonal_image = load_image("data/raw_images/MRI_Test.png")
-    vertical_image = load_image("data/raw_images/cameraman.png")
-    diagonal_image = rgb2gray(diagonal_image)
-    vertical_image = rgb2gray(vertical_image)
+    size = (256, 256)
+    diagonal_image = np.triu(np.ones(shape=size))
+    vertical_image = np.concatenate((np.ones((size[0], size[1]//2)), np.zeros((size[0], size[1]//2))), axis=1)
 
-    snr_range = [1, 2, 4, 8, 16, 32, 64]
+    snr_range = [0.000001, 2, 4, 8, 16, 32, 64]
     number_of_runs_per_snr = 3
 
     diagonal_noisy_images = []
@@ -96,7 +95,7 @@ if __name__ == '__main__':
     vertical_noisy_images = []
     vertical_target_images = []
     for snr in snr_range:
-        simulation = Simulation(cropped_size=(256, 256), snr_range=(snr, snr))
+        simulation = Simulation(input_size=size, cropped_size=(100, 100), snr_range=(snr, snr))
         for index in range(number_of_runs_per_snr):
             diagonal_noisy_image, diagonal_target_image = simulation(diagonal_image)
             diagonal_noisy_images.append(diagonal_noisy_image)
@@ -108,5 +107,5 @@ if __name__ == '__main__':
         print('')
 
     noisy_images = diagonal_noisy_images + vertical_noisy_images
-    plot = plot_image_grid(noisy_images, nrows=2 * len(snr_range))
+    plot = plot_image_grid(noisy_images, ncols=number_of_runs_per_snr)
     plt.show()
