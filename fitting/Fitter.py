@@ -60,10 +60,10 @@ class Fitter:
             self.step_counter += 1
 
     def has_not_converged(self):
-        if len(self.losses_wrt_noisy) < self.convergence_check_length:
+        if self.step_counter < self.convergence_check_length:
             return True
         else:
-            if np.argmin(self.losses_wrt_noisy) < len(self.losses_wrt_noisy) - self.convergence_check_length:
+            if self.best_model_step < self.step_counter - self.convergence_check_length:
                 if self.data_type == torch.cuda.FloatTensor:
                     print('')
                 print(f"Adam has converged at step {self.step_counter}.")
