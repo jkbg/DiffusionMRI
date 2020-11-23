@@ -77,6 +77,13 @@ def show_images(noisy_image, model_image, target_image, result_path=None, model_
         plt.show()
 
 
+def plot_result(result):
+    show_images(result.noisy_image,
+                result.model_image,
+                result.target_image,
+                model_description=str(result.model_parameters))
+
+
 def plot_image_grid(imgs, titles=None, ncols=4):
     clipped_imgs = []
     for img in imgs:
