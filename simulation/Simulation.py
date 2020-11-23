@@ -68,7 +68,11 @@ class Simulation:
         self.transform_set.append(transforms.MriResize(output_sz=cropped_size, targ_op=True, dat_op=False))
 
     def __call__(self, input_image):
-        sample = {'dat': input_image, 'target': input_image.copy(), 'siglevel': np.mean(input_image)}
+        sample = {'dat': input_image, 'target': input_image.copy()}
+        dat = sample['dat']
+        dat = np.reshape(dat, (1,) + dat.shape)
+        sample['dat'] = dat
+        sample['siglevel'] = np.mean(np.absolute(sample['target']))
         for t in self.transform_set:
             sample = t(sample)
         return np.transpose(sample['dat'], (1, 2, 0)), sample['target'][:, :, None]
@@ -88,25 +92,26 @@ if __name__ == '__main__':
     diagonal_image = np.triu(np.ones(shape=size))
     vertical_image = np.concatenate((np.ones((size[0], size[1]//2)), np.zeros((size[0], size[1]//2))), axis=1)
 
-    snr_range = [0.000001, 2, 4, 8, 16, 32, 64]
-    number_of_runs_per_snr = 3
+    cnr_range = [0.25, 1, 2, 4, 8, 16, 32, 64]
+    number_of_runs_per_cnr = 3
 
     diagonal_noisy_images = []
     diagonal_target_images = []
     vertical_noisy_images = []
     vertical_target_images = []
-    for snr in snr_range:
-        simulation = Simulation(input_size=size, cropped_size=(100, 100), snr_range=(snr, snr))
-        for index in range(number_of_runs_per_snr):
+    for cnr in cnr_range:
+        sigma = 1/cnr
+        simulation = Simulation(input_size=size, cropped_size=(100, 100), noise_sigma=sigma)
+        for index in range(number_of_runs_per_cnr):
             diagonal_noisy_image, diagonal_target_image = simulation(diagonal_image)
             diagonal_noisy_images.append(diagonal_noisy_image)
             diagonal_target_images.append(diagonal_target_image)
             vertical_noisy_image, vertical_target_image = simulation(vertical_image)
             vertical_noisy_images.append(vertical_noisy_image)
             vertical_target_images.append(vertical_target_image)
-            print(f'{snr} SNR: {index + 1}/{number_of_runs_per_snr}', end='\r')
+            print(f'{cnr} SNR: {index + 1}/{number_of_runs_per_cnr}', end='\r')
         print('')
 
     noisy_images = diagonal_noisy_images + vertical_noisy_images
-    plot = plot_image_grid(noisy_images, ncols=number_of_runs_per_snr)
+    plot = plot_image_grid(noisy_images, ncols=number_of_runs_per_cnr)
     plt.show()
