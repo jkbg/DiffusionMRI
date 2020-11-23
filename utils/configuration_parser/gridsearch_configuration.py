@@ -49,8 +49,6 @@ class GridsearchConfiguration:
         self.find_best = command_line_arguments.find_best
         self.save_losses = command_line_arguments.save_losses
 
-        self.parameter_combinations = []
-
         if command_line_arguments.cpu:
             self.data_type = torch.FloatTensor
         else:
