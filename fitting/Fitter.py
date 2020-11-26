@@ -107,7 +107,7 @@ class Fitter:
             return False
 
     def log(self):
-        log_string = f"Step: {self.step_counter:05d}"
+        log_string = f"Step: {self.step_counter + 1:05d}"
         log_string += ", "
         log_string += f"Loss: {self.current_loss_wrt_noisy:.6f}"
         log_string += ", "
