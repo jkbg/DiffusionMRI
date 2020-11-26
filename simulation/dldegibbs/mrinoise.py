@@ -49,7 +49,7 @@ class MriNoise(object):
                 low=self.snr_range[0],
                 high=self.snr_range[1])
 
-        if ('siglevel' in sample):
+        if 'siglevel' in sample:
             siglevel = sample['siglevel']
         else:
             siglevel = np.mean(np.absolute(dat[0, ...]))
