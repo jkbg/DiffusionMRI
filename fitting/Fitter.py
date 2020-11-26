@@ -64,10 +64,10 @@ class Fitter:
 
             self.optimizer.step(closure)
 
+            self.step_counter += 1
+
             if self.should_log():
                 self.log()
-
-            self.step_counter += 1
 
     def has_not_converged(self):
         if self.step_counter < self.convergence_check_length:
@@ -104,15 +104,17 @@ class Fitter:
             self.best_model_loss = current_loss_wrt_noisy.data
 
     def should_log(self):
-        if self.step_counter % self.log_frequency == 0:
+        if self.step_counter % self.log_frequency == self.log_frequency:
             return True
-        elif self.step_counter == self.number_of_iterations - 1:
+        elif self.step_counter == self.number_of_iterations:
+            return True
+        elif self.step_counter == 1:
             return True
         else:
             return False
 
     def log(self):
-        log_string = f"Step: {self.step_counter + 1:05d}"
+        log_string = f"Step: {self.step_counter:05d}"
         log_string += ", "
         log_string += f"Loss: {self.current_loss_wrt_noisy:.6f}"
         log_string += ", "
