@@ -37,11 +37,10 @@ class Fitter:
         self.model = model.type(self.data_type)
         self.optimizer = torch.optim.Adam(model.parameters(), lr=self.learning_rate)
         self.step_counter = 0
-        if self.fixed_net_input is None:
-            print('fixed net input is none')
-        print(self.constant_fixed_input)
-        self.fixed_net_input = 2 * torch.rand(self.model.get_input_shape()) - 1
-        self.fixed_net_input = self.fixed_net_input.type(self.data_type)
+        if (self.fixed_net_input is None) or (not self.constant_fixed_input):
+            print('new fixed input')
+            self.fixed_net_input = 2 * torch.rand(self.model.get_input_shape()) - 1
+            self.fixed_net_input = self.fixed_net_input.type(self.data_type)
         self.noisy_image = image_to_tensor(original_image).type(self.data_type)
         self.target_image = image_to_tensor(target_image).type(self.data_type)
         self.best_model = copy.deepcopy(self.model)
