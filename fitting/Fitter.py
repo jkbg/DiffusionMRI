@@ -38,8 +38,7 @@ class Fitter:
         self.step_counter = 0
         if self.fixed_net_input is None:
             print('fixed net input is none')
-        if not self.constant_fixed_input:
-            print('constant entered')
+        print(self.constant_fixed_input)
         self.fixed_net_input = 2 * torch.rand(self.model.get_input_shape()) - 1
         self.fixed_net_input = self.fixed_net_input.type(self.data_type)
         self.noisy_image = image_to_tensor(original_image).type(self.data_type)
