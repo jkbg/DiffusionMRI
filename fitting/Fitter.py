@@ -15,6 +15,7 @@ def create_fitter_from_configuration(fit_model_configuration):
                     data_type=fit_model_configuration.data_type,
                     save_losses=fit_model_configuration.save_losses,
                     constant_fixed_input=fit_model_configuration.constant_input)
+    print(fit_model_configuration.constant_input)
     return fitter
 
 
