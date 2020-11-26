@@ -13,13 +13,14 @@ def create_fitter_from_configuration(fit_model_configuration):
                     log_frequency=fit_model_configuration.log_frequency,
                     find_best=fit_model_configuration.find_best,
                     data_type=fit_model_configuration.data_type,
-                    save_losses=fit_model_configuration.save_losses)
+                    save_losses=fit_model_configuration.save_losses,
+                    constant_fixed_input=fit_model_configuration.constant_input)
     return fitter
 
 
 class Fitter:
     def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=40, log_frequency=10,
-                 find_best=False, data_type=torch.FloatTensor, save_losses=False, constant_fixed_input=True):
+                 find_best=False, data_type=torch.FloatTensor, save_losses=False, constant_fixed_input=False):
         self.loss_fn = torch.nn.MSELoss().type(data_type)
         self.number_of_iterations = number_of_iterations
         self.learning_rate = learning_rate

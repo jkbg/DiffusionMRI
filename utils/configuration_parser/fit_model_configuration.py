@@ -22,6 +22,7 @@ def parse_command_line_arguments():
     parser.add_argument('--log-frequency', type=int, default=1)
     parser.add_argument('--find-best', type=bool, default=True)
     parser.add_argument('--save-losses', type=bool, default=True)
+    parser.add_argument('--constant-input', action='store_true')
     parser.add_argument('--cpu', action='store_true')
     parsed_arguments, non_parsed_arguments = parser.parse_known_args()
     return parsed_arguments
@@ -43,6 +44,7 @@ class ModelFittingConfiguration:
         self.log_frequency = command_line_arguments.log_frequency
         self.find_best = command_line_arguments.find_best
         self.save_losses = command_line_arguments.save_losses
+        self.constant_input = command_line_arguments.constant_input
 
         if command_line_arguments.cpu:
             self.data_type = torch.FloatTensor
