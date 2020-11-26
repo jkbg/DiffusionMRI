@@ -103,7 +103,7 @@ class Fitter:
             self.best_model_loss = current_loss_wrt_noisy.data
 
     def should_log(self):
-        if self.step_counter % self.log_frequency == self.log_frequency:
+        if self.step_counter % self.log_frequency == 0:
             return True
         elif self.step_counter == self.number_of_iterations:
             return True
