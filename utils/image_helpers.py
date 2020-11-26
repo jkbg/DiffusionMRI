@@ -104,9 +104,9 @@ def plot_image_grid(imgs, titles=None, ncols=4):
     return fig
 
 
-def get_images(path, max_amount):
+def get_images(path, max_amount, size=256):
     transform = transforms.Compose([transforms.Grayscale(num_output_channels=1),
-                                    transforms.RandomResizedCrop(size=256, scale=(1.0, 1.0), ratio=(1.0, 1.0)),
+                                    transforms.RandomResizedCrop(size=size, scale=(1.0, 1.0), ratio=(1.0, 1.0)),
                                     transforms.ToTensor()])
 
     image_dataset = datasets.ImageFolder(root=path, transform=transform)

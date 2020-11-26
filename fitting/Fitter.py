@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 import copy
 
 from fitting.Result import Result
