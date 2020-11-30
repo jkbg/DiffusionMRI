@@ -54,11 +54,7 @@ class GridsearchConfiguration:
         if command_line_arguments.cpu:
             self.data_type = torch.FloatTensor
         else:
-            torch.backends.cudnn.enabled = True
-            torch.backends.cudnn.benchmark = True
             self.data_type = torch.cuda.FloatTensor
-            os.environ['CUDA_VISIBLE_DEVICES'] = '3'
-            print("number of GPUs: ", torch.cuda.device_count())
 
     def generate_parameter_combinations(self):
         model_types = self.model_types
