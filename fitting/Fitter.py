@@ -19,7 +19,7 @@ def create_fitter_from_configuration(fit_model_configuration):
 
 
 class Fitter:
-    def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=40, log_frequency=10,
+    def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=None, log_frequency=10,
                  find_best=False, data_type=torch.FloatTensor, save_losses=False, constant_fixed_input=False):
         self.loss_fn = torch.nn.MSELoss().type(data_type)
         self.number_of_iterations = number_of_iterations
@@ -74,16 +74,15 @@ class Fitter:
             self.timings.append(time.time()-start)
 
     def has_not_converged(self):
-        if self.step_counter < self.convergence_check_length:
+        if self.convergence_check_length is None:
+            return True
+        elif self.step_counter < self.convergence_check_length:
             return True
         else:
             if self.best_model_step < self.step_counter - self.convergence_check_length:
-                if self.data_type == torch.cuda.FloatTensor:
-                    print('')
+                print('')
                 print(f"Adam has converged at step {self.step_counter}.")
                 return False
-        if not self.find_best:
-            self.best_model = copy.deepcopy(self.model)
         return True
 
     def update_loss_metrics_and_best_model(self, current_loss_wrt_noisy, current_output):
@@ -121,16 +120,18 @@ class Fitter:
         log_string = f"Step: {self.step_counter:05d}"
         log_string += ", "
         log_string += f"Loss: {self.current_loss_wrt_noisy:.6f}"
-        log_string += ", "
-        log_string += f"Target Loss: {self.current_loss_wrt_target:.6f}"
+        if self.target_image is not None:
+            log_string += ", "
+            log_string += f"Target Loss: {self.current_loss_wrt_target:.6f}"
         if self.find_best:
             log_string += ', '
             log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss:.6f}'
+        print(log_string, end='\r')
 
-        if self.data_type == torch.cuda.FloatTensor:
-            print(log_string, end='\r')
-        else:
-            print(log_string)
+
+
+
+
 
     def get_best_image(self):
         return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())
