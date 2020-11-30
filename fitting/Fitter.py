@@ -1,6 +1,5 @@
 import torch
 import copy
-import time
 
 from fitting.Result import Result
 from utils.image_helpers import image_to_tensor, tensor_to_image
