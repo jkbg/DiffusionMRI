@@ -49,13 +49,10 @@ class Fitter:
             self.losses_wrt_target = []
         self.current_loss_wrt_noisy = 1000
         self.current_loss_wrt_target = 1000
-        self.timings = []
         return self.fit()
 
     def fit(self):
         while self.has_not_converged() and self.step_counter < self.number_of_iterations:
-
-            start = time.time()
 
             def closure():
                 self.optimizer.zero_grad()
@@ -70,8 +67,6 @@ class Fitter:
 
             if self.should_log():
                 self.log()
-
-            self.timings.append(time.time()-start)
 
     def has_not_converged(self):
         if self.convergence_check_length is None:
@@ -127,11 +122,6 @@ class Fitter:
             log_string += ', '
             log_string += f'Minimum Loss at: {self.best_model_step} with {self.best_model_loss:.6f}'
         print(log_string, end='\r')
-
-
-
-
-
 
     def get_best_image(self):
         return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())
