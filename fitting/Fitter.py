@@ -1,5 +1,6 @@
 import torch
 import copy
+import time
 
 from fitting.Result import Result
 from utils.image_helpers import image_to_tensor, tensor_to_image
@@ -53,6 +54,8 @@ class Fitter:
     def fit(self):
         while self.has_not_converged() and self.step_counter < self.number_of_iterations:
 
+            start = time.time()
+
             def closure():
                 self.optimizer.zero_grad()
                 output = self.model(self.fixed_net_input)
@@ -66,6 +69,8 @@ class Fitter:
 
             if self.should_log():
                 self.log()
+
+            print(f'Elapsed time: {time.time()-start}')
 
     def has_not_converged(self):
         if self.step_counter < self.convergence_check_length:
