@@ -61,8 +61,8 @@ class Fitter:
                 self.optimizer.zero_grad()
                 output = self.model(self.fixed_net_input)
                 loss = self.loss_fn(output, self.noisy_image)
-                self.update_loss_metrics_and_best_model(loss, output)
                 loss.backward()
+                self.update_loss_metrics_and_best_model(loss, output)
 
             self.optimizer.step(closure)
 
@@ -88,8 +88,10 @@ class Fitter:
 
     def update_loss_metrics_and_best_model(self, current_loss_wrt_noisy, current_output):
         self.current_loss_wrt_noisy = current_loss_wrt_noisy.data
+
         if self.save_losses:
             self.losses_wrt_noisy.append(self.current_loss_wrt_noisy)
+
         if self.target_image is not None:
             current_loss_wrt_target = self.loss_fn(current_output, self.target_image)
             self.current_loss_wrt_target = current_loss_wrt_target.data
@@ -111,8 +113,6 @@ class Fitter:
         if self.step_counter % self.log_frequency == 0:
             return True
         elif self.step_counter == self.number_of_iterations:
-            return True
-        elif self.step_counter == 1:
             return True
         else:
             return False

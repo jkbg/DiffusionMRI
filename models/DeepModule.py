@@ -12,7 +12,8 @@ class DeepModule(nn.Module):
                                            kernel_size=1, stride=1, bias=False)
         self.upsample_layer = nn.Upsample(size=upsample_size, mode=upsample_mode, align_corners=False)
         self.activation_layer = nn.ReLU()
-        self.batch_normalization = nn.BatchNorm2d(num_features=number_of_output_channels, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        self.batch_normalization = nn.BatchNorm2d(num_features=number_of_output_channels, eps=1e-05, momentum=0.1,
+                                                  affine=True, track_running_stats=True)
 
     def forward(self, module_input):
         x = self.convolution_layer(module_input)
