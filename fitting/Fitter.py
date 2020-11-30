@@ -69,9 +69,9 @@ class Fitter:
 
             if self.should_log():
                 self.log()
+                print('')
 
             print(f'Elapsed time: {time.time()-start}')
-            print('')
 
     def has_not_converged(self):
         if self.step_counter < self.convergence_check_length:
