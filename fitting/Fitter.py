@@ -49,6 +49,7 @@ class Fitter:
             self.losses_wrt_target = []
         self.current_loss_wrt_noisy = 1000
         self.current_loss_wrt_target = 1000
+        self.timings = []
         return self.fit()
 
     def fit(self):
@@ -69,9 +70,8 @@ class Fitter:
 
             if self.should_log():
                 self.log()
-                print('')
 
-            print(f'Elapsed time: {time.time()-start}')
+            self.timings.append(time.time()-start)
 
     def has_not_converged(self):
         if self.step_counter < self.convergence_check_length:
