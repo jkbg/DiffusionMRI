@@ -1,9 +1,7 @@
-import torch
 import torch.nn as nn
 import numpy as np
 
 from models.DeepModule import DeepModule
-from torchsummary import summary
 
 
 class DeepDecoder(nn.Module):
