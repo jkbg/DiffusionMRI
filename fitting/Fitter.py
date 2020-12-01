@@ -56,7 +56,7 @@ class Fitter:
             def closure():
                 self.optimizer.zero_grad()
                 output = self.model(self.fixed_net_input)
-                loss = self.loss_fn(output, self.noisy_image)
+                loss = self.loss_fn(self.noisy_image, output)
                 loss.backward()
                 self.update_loss_metrics_and_best_model(loss, output)
 
