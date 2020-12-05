@@ -41,6 +41,8 @@ class Fitter:
         self.noisy_image = image_to_tensor(original_image).type(self.data_type)
         if target_image is not None:
             self.target_image = image_to_tensor(target_image).type(self.data_type)
+        else:
+            self.target_image = None
         self.best_model = copy.deepcopy(self.model)
         self.best_model_step = 0
         self.best_model_loss = 1000
