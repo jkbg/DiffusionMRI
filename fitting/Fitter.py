@@ -31,7 +31,7 @@ class Fitter:
         self.constant_fixed_input = constant_fixed_input
         self.fixed_net_input = None
 
-    def __call__(self, model, original_image, target_image, log_prefix=None):
+    def __call__(self, model, original_image, target_image=None, log_prefix=None):
         self.model = model.type(self.data_type)
         self.optimizer = torch.optim.Adam(model.parameters(), lr=self.learning_rate)
         self.step_counter = 0
@@ -39,7 +39,8 @@ class Fitter:
             self.fixed_net_input = 2 * torch.rand(self.model.get_input_shape()) - 1
             self.fixed_net_input = self.fixed_net_input.type(self.data_type)
         self.noisy_image = image_to_tensor(original_image).type(self.data_type)
-        self.target_image = image_to_tensor(target_image).type(self.data_type)
+        if target_image is not None:
+            self.target_image = image_to_tensor(target_image).type(self.data_type)
         self.best_model = copy.deepcopy(self.model)
         self.best_model_step = 0
         self.best_model_loss = 1000
@@ -131,7 +132,10 @@ class Fitter:
         return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())
 
     def get_final_target_loss(self):
-        return self.loss_fn(self.best_model(self.fixed_net_input).detach(), self.target_image)
+        if self.target_image is not None:
+            return self.loss_fn(self.best_model(self.fixed_net_input).detach(), self.target_image)
+        else:
+            return 0
 
     def get_step_counter(self):
         return self.step_counter
