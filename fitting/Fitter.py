@@ -53,7 +53,7 @@ class Fitter:
             self.log_prefix = ''
         else:
             self.log_prefix = log_prefix
-        return self.fit()
+        self.fit()
 
     def fit(self):
         while self.has_not_converged() and self.step_counter < self.number_of_iterations:
