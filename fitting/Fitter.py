@@ -31,7 +31,7 @@ class Fitter:
         self.constant_fixed_input = constant_fixed_input
         self.fixed_net_input = None
 
-    def __call__(self, model, original_image, target_image):
+    def __call__(self, model, original_image, target_image, log_prefix=None):
         self.model = model.type(self.data_type)
         self.optimizer = torch.optim.Adam(model.parameters(), lr=self.learning_rate)
         self.step_counter = 0
@@ -48,6 +48,10 @@ class Fitter:
             self.losses_wrt_target = []
         self.current_loss_wrt_noisy = 1000
         self.current_loss_wrt_target = 1000
+        if log_prefix is None:
+            self.log_prefix = ''
+        else:
+            self.log_prefix = log_prefix
         return self.fit()
 
     def fit(self):
@@ -111,7 +115,8 @@ class Fitter:
             return False
 
     def log(self):
-        log_string = f"Step: {self.step_counter:05d}"
+        log_string = self.log_prefix
+        log_string += f"Step: {self.step_counter:05d}"
         log_string += ", "
         log_string += f"Loss: {self.current_loss_wrt_noisy:.6f}"
         if self.target_image is not None:
