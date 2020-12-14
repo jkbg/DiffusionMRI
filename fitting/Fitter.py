@@ -20,7 +20,7 @@ def create_fitter_from_configuration(fit_model_configuration):
 class Fitter:
     def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=None, log_frequency=10,
                  find_best=False, data_type=torch.FloatTensor, save_losses=False, constant_fixed_input=False):
-        self.loss_fn = torch.nn.MSELoss().type(data_type)
+        self.loss_function = torch.nn.MSELoss().type(data_type)
         self.number_of_iterations = number_of_iterations
         self.learning_rate = learning_rate
         self.convergence_check_length = convergence_check_length
@@ -63,7 +63,7 @@ class Fitter:
             def closure():
                 self.optimizer.zero_grad()
                 output = self.model(self.fixed_net_input)
-                loss = self.loss_fn(self.noisy_image, output)
+                loss = self.loss_function(self.noisy_image, output)
                 loss.backward()
                 self.update_loss_metrics_and_best_model(loss, output)
 
@@ -93,7 +93,7 @@ class Fitter:
             self.losses_wrt_noisy.append(self.current_loss_wrt_noisy)
 
         if self.target_image is not None:
-            current_loss_wrt_target = self.loss_fn(current_output, self.target_image)
+            current_loss_wrt_target = self.loss_function(current_output, self.target_image)
             self.current_loss_wrt_target = current_loss_wrt_target.data
             if self.save_losses:
                 self.losses_wrt_target.append(self.current_loss_wrt_target.data)
@@ -135,7 +135,7 @@ class Fitter:
 
     def get_final_target_loss(self):
         if self.target_image is not None:
-            return self.loss_fn(self.best_model(self.fixed_net_input).detach(), self.target_image)
+            return self.loss_function(self.best_model(self.fixed_net_input).detach(), self.target_image)
         else:
             return 0
 

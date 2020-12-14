@@ -3,7 +3,7 @@ import simulation.dldegibbs as transforms
 
 from matplotlib import pyplot as plt
 
-from utils.image_helpers import  plot_image_grid
+from utils.image_helpers import plot_image_grid
 
 
 class Simulation:
@@ -63,7 +63,8 @@ class Simulation:
 
         self.transform_set.append(transforms.MriNormalize(percentile_norm='Max', targ_op=True))
 
-        self.transform_set.append(transforms.MriAbsolute(targ_op=True, dat_op=absolute_output))
+        if absolute_output:
+            self.transform_set.append(transforms.MriAbsolute(targ_op=True, dat_op=True))
 
         self.transform_set.append(transforms.MriResize(output_sz=cropped_size, targ_op=True, dat_op=False))
 
