@@ -66,7 +66,7 @@ class Simulation:
         if absolute_output:
             self.transform_set.append(transforms.MriAbsolute(targ_op=True, dat_op=True))
 
-        self.transform_set.append(transforms.MriResize(output_sz=cropped_size, targ_op=True, dat_op=False))
+        self.transform_set.append(transforms.MriResize(output_sz=cropped_size, targ_op=True, dat_op=False, complex_flag=not absolute_output))
 
     def __call__(self, input_image):
         sample = {'dat': input_image, 'target': input_image.copy()}
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     vertical_target_images = []
     for cnr in cnr_range:
         sigma = 1/cnr
-        simulation = Simulation(input_size=size, cropped_size=(100, 100), noise_sigma=sigma)
+        simulation = Simulation(input_size=size, cropped_size=(100, 100), noise_sigma=sigma, absolute_output=False)
         for index in range(number_of_runs_per_cnr):
             vertical_noisy_image, vertical_target_image = simulation(vertical_image)
             vertical_noisy_images.append(vertical_noisy_image)
