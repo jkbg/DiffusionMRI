@@ -106,11 +106,11 @@ def plot_image_grid(imgs, titles=None, ncols=4):
 
 def get_images(path, max_amount, size=256):
     transform = transforms.Compose([transforms.Grayscale(num_output_channels=1),
-                                    transforms.RandomResizedCrop(size=size, scale=(1.0, 1.0), ratio=(1.0, 1.0)),
+                                    transforms.RandomCrop(size=size, pad_if_needed=True, padding_mode='reflect'),
                                     transforms.ToTensor()])
 
     image_dataset = datasets.ImageFolder(root=path, transform=transform)
-    print('Number of Images:', len(image_dataset), 'in', path)
+    print(len(image_dataset), ' images found in ', path)
 
     image_data_loader = torch.utils.data.DataLoader(image_dataset, batch_size=1, shuffle=True)
     data_iter = iter(image_data_loader)
@@ -119,5 +119,5 @@ def get_images(path, max_amount, size=256):
         try:
             images.append(tensor_to_image(next(data_iter)[0][0, ...]))
         except StopIteration:
-            break
+            data_iter = iter(image_data_loader)
     return [np.squeeze(image) for image in images]
