@@ -74,6 +74,15 @@ class SimulationPipeline:
             noisy_image = np.absolute(noisy_image)
         return noisy_image, image
 
+    def simulate_list(self, images):
+        target_images = []
+        noisy_images = []
+        for image in images:
+            noisy_image, target_image = self.simulate(image)
+            noisy_images.append(noisy_image)
+            target_images.append(target_image)
+        return noisy_images, target_images
+
 
 if __name__ == '__main__':
     size = (130, 130)
