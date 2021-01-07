@@ -73,7 +73,7 @@ class SimulationPipeline:
         if self.absolute_output:
             noisy_image = np.absolute(noisy_image)
 
-        noisy_image = np.transpose(noisy_image, (1, 2, 0))
+        noisy_image = noisy_image[:, :, None]
         target_image = image[:, :, None]
         return noisy_image, target_image
 
