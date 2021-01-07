@@ -38,7 +38,6 @@ def pad_cropped_spectrum(image, pad_parameters):
 def apply_partial_fourier(array, pf_factor):
     cutoff = int(array.shape[1] * (1 - pf_factor))
     array[:, :cutoff] = 0 + 0j
-    print(array[:, :cutoff].shape)
     return array
 
 
