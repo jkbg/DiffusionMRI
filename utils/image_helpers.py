@@ -120,4 +120,5 @@ def get_images(path, max_amount, size=256):
             images.append(tensor_to_image(next(data_iter)[0][0, ...]))
         except StopIteration:
             data_iter = iter(image_data_loader)
+            images.append(tensor_to_image(next(data_iter)[0][0, ...]))
     return [np.squeeze(image) for image in images]
