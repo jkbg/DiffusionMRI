@@ -26,8 +26,8 @@ def gibbs_crop(image_spectrum, k_factor):
 
 
 def generate_noise(shape, snr, avg_signal_power):
-    sigma = avg_signal_power / snr
-    noise = sigma * np.random.normal(size=shape)
+    sigma = avg_signal_power / snr / np.sqrt(2)
+    noise = sigma * (np.random.normal(size=shape) + 1j * np.random.normal(size=shape))
     return noise
 
 
@@ -49,32 +49,33 @@ class SimulationPipeline:
         self.absolute_output = absolute_output
 
     def simulate(self, image):
-        avg_signal_power = np.mean(np.average(image))
-        if self.snr is not None:
-            noise = generate_noise(image.shape, self.snr, avg_signal_power)
-        else:
-            noise = np.zeros(image.shape)
-
         image_spectrum = fft(image)
-        noise_spectrum = fft(noise)
 
         image_spectrum, pad_parameters = gibbs_crop(image_spectrum, self.k_factor)
-        noise_spectrum, pad_parameters = gibbs_crop(noise_spectrum, self.k_factor)
+
+        avg_signal_power = np.sqrt(np.mean(np.absolute(image_spectrum) ** 2))
+
+        if self.snr is not None:
+            noise_spectrum = generate_noise(image_spectrum.shape, self.snr, avg_signal_power)
+        else:
+            noise_spectrum = np.zeros(image_spectrum.shape)
+
+        image_spectrum += noise_spectrum
+
         image_spectrum = pad_cropped_spectrum(image_spectrum, pad_parameters)
 
         image_spectrum = apply_partial_fourier(image_spectrum, self.pf_factor)
-        noise_spectrum = apply_partial_fourier(noise_spectrum, self.pf_factor)
 
         gibbs_image = ifft(image_spectrum)
-        noise = ifft(noise_spectrum)
 
-        noisy_image = gibbs_image + noise
+        noisy_image = gibbs_image
 
         if self.absolute_output:
             noisy_image = np.absolute(noisy_image)
 
         noisy_image = noisy_image[:, :, None]
         target_image = image[:, :, None]
+
         return noisy_image, target_image
 
     def simulate_list(self, images):
@@ -92,13 +93,14 @@ if __name__ == '__main__':
     diagonal_image = np.triu(np.ones(shape=size))
     vertical_image = np.concatenate((np.ones((size[0], size[1] // 2)), np.zeros((size[0], size[1] // 2))), axis=1)
 
-    snr_range = [0.25, 8, 16, 32]
+    cnr_range = [0.1, 0.5, 1, 2, 4, 8, 16, 1024]
     number_of_runs_per_cnr = 1
 
     vertical_noisy_images = []
     vertical_target_images = []
-    for snr in snr_range:
-        pipeline = SimulationPipeline(k_factor=0.5, snr=snr, pf_factor=0.625)
+    for cnr in cnr_range:
+        snr = cnr / 2
+        pipeline = SimulationPipeline(k_factor=1.0, snr=snr, pf_factor=1.0)
         for index in range(number_of_runs_per_cnr):
             vertical_noisy_image, vertical_target_image = pipeline.simulate(vertical_image)
             vertical_noisy_images.append(vertical_noisy_image)
@@ -106,6 +108,6 @@ if __name__ == '__main__':
             print(f'{snr} SNR: {index + 1}/{number_of_runs_per_cnr}', end='\r')
         print('')
 
-    titles = [str(x) for x in snr_range for _ in range(number_of_runs_per_cnr)]
-    plot = plot_image_grid(vertical_noisy_images, titles=titles, ncols=4)
+    titles = [str(x) for x in cnr_range for _ in range(number_of_runs_per_cnr)]
+    plot = plot_image_grid(vertical_noisy_images, titles=titles, ncols=2)
     plt.show()
