@@ -1,68 +1,23 @@
 import numpy as np
-import scipy.signal
-import scipy.ndimage
 import scipy.optimize as opt
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from skimage.metrics import structural_similarity
+from sewar.full_ref import vifp
 
 
-def mse(a, b):
-    return (np.square(a - b)).mean(axis=None)
+def mse(target, noisy):
+    return (np.square(target - noisy)).mean(axis=None)
 
 
-def vifp_mscale(ref, dist):
-    # from https://github.com/aizvorski/video-quality/blob/master/vifp.py
+def psnr(target, noisy):
+    return 10 * np.log10(np.square(np.max(target)) / mse(target, noisy))
 
-    sigma_nsq = 2
-    eps = 1e-10
 
-    num = 0.0
-    den = 0.0
-    for scale in range(1, 5):
+def ssim(target, noisy):
+    return structural_similarity(target, noisy, multichannel=True)
 
-        N = 2 ** (4 - scale + 1) + 1
-        sd = N / 5.0
 
-        if (scale > 1):
-            ref = scipy.ndimage.gaussian_filter(ref, sd)
-            dist = scipy.ndimage.gaussian_filter(dist, sd)
-            ref = ref[::2, ::2]
-            dist = dist[::2, ::2]
-
-        mu1 = scipy.ndimage.gaussian_filter(ref, sd)
-        mu2 = scipy.ndimage.gaussian_filter(dist, sd)
-        mu1_sq = mu1 * mu1
-        mu2_sq = mu2 * mu2
-        mu1_mu2 = mu1 * mu2
-        sigma1_sq = scipy.ndimage.gaussian_filter(ref * ref, sd) - mu1_sq
-        sigma2_sq = scipy.ndimage.gaussian_filter(dist * dist, sd) - mu2_sq
-        sigma12 = scipy.ndimage.gaussian_filter(ref * dist, sd) - mu1_mu2
-
-        sigma1_sq[sigma1_sq < 0] = 0
-        sigma2_sq[sigma2_sq < 0] = 0
-
-        g = sigma12 / (sigma1_sq + eps)
-        sv_sq = sigma2_sq - g * sigma12
-
-        g[sigma1_sq < eps] = 0
-        sv_sq[sigma1_sq < eps] = sigma2_sq[sigma1_sq < eps]
-        sigma1_sq[sigma1_sq < eps] = 0
-
-        g[sigma2_sq < eps] = 0
-        sv_sq[sigma2_sq < eps] = 0
-
-        sv_sq[g < 0] = sigma2_sq[g < 0]
-        g[g < 0] = 0
-        sv_sq[sv_sq <= eps] = eps
-
-        num += np.sum(np.log10(1 + g * g * sigma1_sq / (sv_sq + sigma_nsq)))
-        den += np.sum(np.log10(1 + sigma1_sq / sigma_nsq))
-
-    vifp = num / den
-
-    if np.isnan(vifp):
-        return 1.0
-    else:
-        return vifp
+def vif(target, noisy):
+    return vifp(target, noisy)
 
 
 def calculate_model_performances(results):
@@ -83,11 +38,9 @@ def calculate_noisy_performance(results):
     given_image_pairs = get_given_image_pairs(results)
     performance = generate_performance(description='Average Noisy Performance',
                                        mse_target=np.mean([mse(x[0], x[1]) for x in given_image_pairs]),
-                                       vif=np.mean([vifp_mscale(x[1], x[0]) for x in given_image_pairs]),
-                                       psnr=np.mean([peak_signal_noise_ratio(x[1], x[0]) for x in given_image_pairs]),
-                                       ssim=np.mean([structural_similarity(x[1], x[0], multichannel=True,
-                                                                           data_range=np.max(x[1])) for x in
-                                                     given_image_pairs]))
+                                       vif=np.mean([vif(x[1], x[0]) for x in given_image_pairs]),
+                                       psnr=np.mean([psnr(x[1], x[0]) for x in given_image_pairs]),
+                                       ssim=np.mean([ssim(x[1], x[0]) for x in given_image_pairs]))
     return performance
 
 
@@ -175,50 +128,51 @@ def split_performances(performances, split_type='number_of_channels'):
     return performances_split_per_type
 
 
-def logistic_function(x, alpha, beta, gamma):
-    return alpha / (1. + np.exp((x - beta) / gamma))
+def logistic_function(x, alpha, beta, gamma, c):
+    return alpha / (1. + np.exp((x - beta) / gamma)) + c
 
 
-def logistic_sum(x, a1, a2, a3, b1, b2, b3, g1, g2, g3, c):
-    alphas = [a1, a2, a3]
-    betas = [b1, b2, b3]
-    gammas = [g1, g2, g3]
-    out = 0.0
-    for (alpha, beta, gamma) in zip(alphas, betas, gammas):
-        out += logistic_function(x, alpha, beta, gamma)
-    out += c
-    return out
+def calculate_fwhm(image, accuracy_factor=100, max_iterations=1000):
+    np.seterr(all='ignore')
+    number_of_pixels = image.shape[1]
+    fitted_rows = []
+    row_fwhms = []
 
+    # Setting Parameter Estimates
+    alpha_estimate = [1.]
+    beta_estimate = [number_of_pixels / 2.]
+    gamma_estimate = [1.]
+    c_estimate = [0.5]
+    estimated_parameters = alpha_estimate + beta_estimate + gamma_estimate + c_estimate
 
-def logistic_sum_differentiation(x, alphas, betas, gammas):
-    out = 0.0
-    for (alpha, beta, gamma) in zip(alphas, betas, gammas):
-        out += logistic_differentiation(x, alpha, beta, gamma)
-    return out
+    # Setting Parameter Bounds
+    lower_alpha_bound = [0.001]
+    upper_alpha_bound = [np.inf]
+    lower_beta_bound = [0.4 * number_of_pixels]
+    upper_beta_bound = [0.6 * number_of_pixels]
+    lower_gamma_bound = [0.0001]
+    upper_gamma_bound = [25]
+    lower_c_bound = [-np.inf]
+    upper_c_bound = [np.inf]
+    lower_bounds = lower_alpha_bound + lower_beta_bound + lower_gamma_bound + lower_c_bound
+    upper_bounds = upper_alpha_bound + upper_beta_bound + upper_gamma_bound + upper_c_bound
+    bounds = (np.array(lower_bounds), np.array(upper_bounds))
 
+    for row_index, row in enumerate(image[:, :, 0]):
+        (a, b, g, c), _ = opt.curve_fit(f=logistic_function,
+                                        xdata=np.arange(number_of_pixels),
+                                        ydata=row,
+                                        p0=estimated_parameters,
+                                        bounds=bounds,
+                                        maxfev=max_iterations)
+        extended_x = np.linspace(-number_of_pixels, 2 * number_of_pixels, num=number_of_pixels * accuracy_factor)
+        fitted_row = logistic_function(extended_x, a, b, g, c)
+        differences = -np.diff(fitted_row)
+        half_max = np.max(differences) / 2.
+        indices = np.where(np.diff(np.sign(differences - half_max)))[0]
+        row_fwhm = (indices[-1] - indices[0]) / accuracy_factor
 
-def logistic_differentiation(x, alpha, beta, gamma):
-    return alpha * np.exp((x - beta) / gamma) / (gamma * (1. + np.exp((x - beta) / gamma)) ** 2)
+        fitted_rows.append(fitted_row)
+        row_fwhms.append(row_fwhm)
 
-
-def calculate_full_width_half_maximum_value(row, accuracy_factor=100, estimated_parameters=None, max_iter=1000):
-    number_of_pixels = len(row)
-    x = np.linspace(0, number_of_pixels, num=number_of_pixels * accuracy_factor)
-    if estimated_parameters is None:
-        estimated_parameters = [0.3, 0.3, 0.3,
-                                number_of_pixels / 2., number_of_pixels / 2., number_of_pixels / 2.,
-                                1., 1., 1.,
-                                0]
-    (a1, a2, a3, b1, b2, b3, g1, g2, g3, c), _ = opt.curve_fit(logistic_sum,
-                                                               np.arange(number_of_pixels),
-                                                               row,
-                                                               p0=estimated_parameters,
-                                                               maxfev=max_iter)
-    alphas = [a1, a2, a3]
-    betas = [b1, b2, b3]
-    gammas = [g1, g2, g3]
-    fitted_row = logistic_sum(x, *alphas, *betas, *gammas, c)
-    differences = -np.diff(fitted_row)
-    half_max = np.max(differences) / 2.
-    indices = np.where(np.diff(np.sign(differences - half_max)))[0]
-    return (indices[-1] - indices[0]) / accuracy_factor, fitted_row
+    return np.mean(row_fwhms), fitted_rows

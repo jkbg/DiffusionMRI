@@ -1,6 +1,5 @@
 import numpy as np
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-from utils.evaluation_helpers import vifp_mscale, mse, split_result_list
+from utils.evaluation_helpers import mse, psnr, ssim, vif, split_result_list
 
 
 def generate_rudimentary_result(model_parameters, noisy_image, model_image, target_image):
@@ -19,9 +18,9 @@ class Result:
         self.best_loss_wrt_noisy = best_loss_wrt_noisy
         self.loss_wrt_target = loss_wrt_target
         self.number_of_iterations = number_of_iterations
-        self.vif = vifp_mscale(target_image, model_image)
-        self.psnr = peak_signal_noise_ratio(target_image, model_image)
-        self.ssim = structural_similarity(target_image, model_image, multichannel=True, data_range=np.max(target_image))
+        self.vif = vif(target_image, model_image)
+        self.psnr = psnr(target_image, model_image)
+        self.ssim = ssim(target_image, model_image)
 
     def __str__(self):
         output_string = str(self.loss_wrt_target)
