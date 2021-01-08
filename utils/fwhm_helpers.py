@@ -49,7 +49,7 @@ def calculate_fwhm(image, accuracy_factor=100, max_iterations=1000):
         fitted_rows.append(fitted_row)
         row_fwhms.append(row_fwhm)
 
-    return np.mean(row_fwhms), fitted_rows
+    return np.mean(row_fwhms), np.mean(fitted_rows, axis=0)
 
 
 def calculate_vertical_profile(image):
