@@ -27,7 +27,7 @@ def gibbs_crop(image_spectrum, k_factor):
 
 def generate_noise(shape, snr, avg_signal_power):
     sigma = avg_signal_power / snr
-    noise = sigma * (np.random.normal(size=shape) + 1j * np.random.normal(size=shape))
+    noise = sigma * np.random.normal(size=shape)
     return noise
 
 
@@ -59,6 +59,7 @@ class SimulationPipeline:
         noise_spectrum = fft(noise)
 
         image_spectrum, pad_parameters = gibbs_crop(image_spectrum, self.k_factor)
+        noise_spectrum, pad_parameters = gibbs_crop(noise_spectrum, self.k_factor)
         image_spectrum = pad_cropped_spectrum(image_spectrum, pad_parameters)
 
         image_spectrum = apply_partial_fourier(image_spectrum, self.pf_factor)
