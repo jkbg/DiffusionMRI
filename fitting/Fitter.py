@@ -81,8 +81,7 @@ class Fitter:
             return True
         else:
             if self.best_model_step < self.step_counter - self.convergence_check_length:
-                print('')
-                print(f"Adam has converged at step {self.step_counter}.")
+                print(self.log_prefix + f'Converged at step {self.step_counter}.', end='\r')
                 return False
         return True
 
