@@ -19,13 +19,36 @@ def vif(target, noisy):
     return vifp(target, noisy)
 
 
+def performance_from_images(reconstructed_image, target_image, id):
+    return generate_performance(id=id,
+                                mse=mse(target_image, reconstructed_image),
+                                psnr=psnr(target_image, reconstructed_image),
+                                vif=vif(target_image, reconstructed_image),
+                                ssim=ssim(target_image, reconstructed_image))
+
+
+def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None):
+    performance = {}
+    if id is not None:
+        performance['description'] = id
+    if mse is not None:
+        performance['mse_target'] = mse
+    if psnr is not None:
+        performance['psnr'] = psnr
+    if vif is not None:
+        performance['vif'] = vif
+    if ssim is not None:
+        performance['ssim'] = ssim
+    return performance
+
+
 def calculate_model_performances(results):
     splitted_results = split_result_list(results, model_split=True, image_split=False)
     performances = []
     for model_results in splitted_results:
-        performance = generate_performance(description=model_results[0].model_parameters,
+        performance = generate_performance(id=model_results[0].model_parameters,
                                            mse_noisy=np.mean([x.best_loss_wrt_noisy for x in model_results]),
-                                           mse_target=np.mean([x.loss_wrt_target for x in model_results]),
+                                           mse=np.mean([x.loss_wrt_target for x in model_results]),
                                            psnr=np.mean([x.psnr for x in model_results]),
                                            vif=np.mean([x.vif for x in model_results]),
                                            ssim=np.mean([x.ssim for x in model_results]))
@@ -35,8 +58,8 @@ def calculate_model_performances(results):
 
 def calculate_noisy_performance(results):
     given_image_pairs = get_given_image_pairs(results)
-    performance = generate_performance(description='Average Noisy Performance',
-                                       mse_target=np.mean([mse(x[0], x[1]) for x in given_image_pairs]),
+    performance = generate_performance(id='Average Noisy Performance',
+                                       mse=np.mean([mse(x[0], x[1]) for x in given_image_pairs]),
                                        vif=np.mean([vif(x[1], x[0]) for x in given_image_pairs]),
                                        psnr=np.mean([psnr(x[1], x[0]) for x in given_image_pairs]),
                                        ssim=np.mean([ssim(x[1], x[0]) for x in given_image_pairs]))
@@ -90,23 +113,6 @@ def split_result_list(results, model_split=True, image_split=False):
     return further_splitted_result_list
 
 
-def generate_performance(description=None, mse_noisy=None, mse_target=None, psnr=None, vif=None, ssim=None):
-    performance = {}
-    if description is not None:
-        performance['description'] = description
-    if mse_noisy is not None:
-        performance['mse_noisy'] = mse_noisy
-    if mse_target is not None:
-        performance['mse_target'] = mse_target
-    if psnr is not None:
-        performance['psnr'] = psnr
-    if vif is not None:
-        performance['vif'] = vif
-    if ssim is not None:
-        performance['ssim'] = ssim
-    return performance
-
-
 def split_performances(performances, split_type='number_of_channels'):
     performances_split_per_type = {}
     index = 0
@@ -125,5 +131,3 @@ def split_performances(performances, split_type='number_of_channels'):
             filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
         performances_split_per_type[str(unique_type)] = performances_per_type
     return performances_split_per_type
-
-
