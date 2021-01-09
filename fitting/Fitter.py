@@ -5,21 +5,22 @@ from fitting.Result import Result
 from utils.image_helpers import image_to_tensor, tensor_to_image
 
 
-def create_fitter_from_configuration(fit_model_configuration):
-    fitter = Fitter(number_of_iterations=fit_model_configuration.number_of_iterations,
-                    learning_rate=fit_model_configuration.learning_rate,
-                    convergence_check_length=fit_model_configuration.convergence_check_length,
-                    log_frequency=fit_model_configuration.log_frequency,
-                    find_best=fit_model_configuration.find_best,
-                    data_type=fit_model_configuration.data_type,
-                    save_losses=fit_model_configuration.save_losses,
-                    constant_fixed_input=fit_model_configuration.constant_input)
+def create_fitter_from_configuration(configuration):
+    fitter = Fitter(number_of_iterations=configuration.number_of_iterations,
+                    learning_rate=configuration.learning_rate,
+                    convergence_check_length=configuration.convergence_check_length,
+                    log_frequency=configuration.log_frequency,
+                    find_best=configuration.find_best,
+                    data_type=configuration.data_type,
+                    save_losses=configuration.save_losses,
+                    constant_fixed_input=configuration.constant_input,
+                    number_of_runs=configuration.number_of_runs)
     return fitter
 
 
 class Fitter:
     def __init__(self, number_of_iterations, learning_rate=0.01, convergence_check_length=None, log_frequency=10,
-                 find_best=False, data_type=torch.FloatTensor, save_losses=False, constant_fixed_input=False):
+                 find_best=False, data_type=torch.FloatTensor, save_losses=False, constant_fixed_input=False, number_of_runs=10):
         self.loss_function = torch.nn.MSELoss().type(data_type)
         self.number_of_iterations = number_of_iterations
         self.learning_rate = learning_rate
@@ -30,6 +31,7 @@ class Fitter:
         self.save_losses = save_losses
         self.constant_fixed_input = constant_fixed_input
         self.fixed_net_input = None
+        self.number_of_runs = number_of_runs
 
     def __call__(self, model, original_image, target_image=None, log_prefix=None):
         self.model = model.type(self.data_type)
@@ -56,6 +58,7 @@ class Fitter:
         else:
             self.log_prefix = log_prefix
         self.fit()
+        #TODO: Number of runs + averaging
 
     def fit(self):
         while self.has_not_converged() and self.step_counter < self.number_of_iterations:

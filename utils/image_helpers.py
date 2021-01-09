@@ -3,30 +3,6 @@ from torchvision import datasets, transforms
 import numpy as np
 from matplotlib import pyplot as plt
 import torch
-from time import gmtime, strftime
-
-
-def rgb2gray(rgb):
-    return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
-
-
-def load_image(filepath):
-    rgba_image = plt.imread(filepath)
-    rgb_image = rgba_image[:, :, :3]
-    return rgb_image
-
-
-def load_images(filepaths):
-    images = []
-    for filepath in filepaths:
-        rgb_image = load_image(filepath)
-        images.append(rgb_image)
-    return images
-
-
-def load_noisy_and_target_image(fit_model_configuration):
-    paths = [fit_model_configuration.noisy_image_path, fit_model_configuration.target_image_path]
-    return load_images(paths)
 
 
 def tensor_to_image(tensor):
@@ -44,44 +20,6 @@ def prepare_for_plot(image):
     image = image - np.min(image)
     image = image / np.max(image)
     return (image * 255).astype(np.uint8)
-
-
-def show_images(noisy_image, model_image, target_image, result_path=None, model_description=None):
-    model_image = prepare_for_plot(model_image)
-
-    fig = plt.figure(figsize=(12, 5))
-
-    ax = fig.add_subplot(131)
-    ax.imshow(noisy_image, "gray")
-    ax.set_title("Noisy Image")
-    ax.axis("off")
-
-    ax = fig.add_subplot(132)
-    ax.imshow(model_image, "gray")
-    if model_description is not None:
-        ax.set_title(str(model_description))
-    else:
-        ax.set_title("Model Image")
-    ax.axis("off")
-
-    ax = fig.add_subplot(133)
-    ax.imshow(target_image, "gray")
-    ax.set_title("Target Image")
-    ax.axis("off")
-    plt.tight_layout()
-
-    if result_path is not None:
-        path = result_path + strftime("%Y-%m-%d-%H:%M" + ".png", gmtime())
-        plt.savefig(path)
-        print('saved at', path)
-        plt.show()
-
-
-def plot_result(result):
-    show_images(result.noisy_image,
-                result.model_image,
-                result.target_image,
-                model_description=str(result.model_parameters))
 
 
 def plot_image_grid(imgs, titles=None, ncols=4):
@@ -121,4 +59,4 @@ def get_images(path, max_amount, size=256):
         except StopIteration:
             data_iter = iter(image_data_loader)
             images.append(tensor_to_image(next(data_iter)[0][0, ...]))
-    return [np.squeeze(image)[:,:,None] for image in images]
+    return [np.squeeze(image)[:, :, None] for image in images]

@@ -55,8 +55,3 @@ def calculate_fwhm(image, accuracy_factor=100, max_iterations=1000, critical_alp
     return np.mean(row_fwhms)
 
 
-def calculate_vertical_profile(image):
-    columns = np.mean(image, axis=0)
-    return columns
-
-
