@@ -32,7 +32,7 @@ def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None):
     if id is not None:
         performance['id'] = id
     if mse is not None:
-        performance['mse_target'] = mse
+        performance['mse'] = mse
     if psnr is not None:
         performance['psnr'] = psnr
     if vif is not None:
@@ -81,7 +81,6 @@ def average_performances(performances, keys):
             avg_performance[performance_parameter] = np.mean([x[performance_parameter] for x in split])
         avg_performances.append(avg_performance)
     return avg_performances
-
 
 
 def calculate_model_performances(results):
