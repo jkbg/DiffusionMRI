@@ -40,12 +40,14 @@ def calculate_fwhm(image, accuracy_factor=100, max_iterations=1000):
                                         bounds=bounds,
                                         maxfev=max_iterations)
         extended_x = np.linspace(-number_of_pixels, 2 * number_of_pixels, num=number_of_pixels * accuracy_factor)
-        fitted_row = logistic_function(extended_x, a, b, g, c)
-        differences = -np.diff(fitted_row)
+        extended_fitted_row = logistic_function(extended_x, a, b, g, c)
+        differences = -np.diff(extended_fitted_row)
         half_max = np.max(differences) / 2.
         indices = np.where(np.diff(np.sign(differences - half_max)))[0]
         row_fwhm = (indices[-1] - indices[0]) / accuracy_factor
 
+        x = np.arange(number_of_pixels)
+        fitted_row = logistic_function(x, a, b, g, c)
         fitted_rows.append(fitted_row)
         row_fwhms.append(row_fwhm)
 
