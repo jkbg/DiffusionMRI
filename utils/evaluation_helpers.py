@@ -30,7 +30,7 @@ def performance_from_images(reconstructed_image, target_image, id):
 def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None):
     performance = {}
     if id is not None:
-        performance['description'] = id
+        performance['id'] = id
     if mse is not None:
         performance['mse_target'] = mse
     if psnr is not None:
