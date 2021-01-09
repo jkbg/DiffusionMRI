@@ -9,8 +9,8 @@ def logistic_function(x, alpha, beta, gamma, c):
 def calculate_fwhm(image, accuracy_factor=100, max_iterations=1000):
     np.seterr(all='ignore')
     number_of_pixels = image.shape[1]
-    fitted_rows = []
     row_fwhms = []
+    fitted_parameters = []
 
     # Setting Parameter Estimates
     alpha_estimate = [1.]
@@ -46,12 +46,10 @@ def calculate_fwhm(image, accuracy_factor=100, max_iterations=1000):
         indices = np.where(np.diff(np.sign(differences - half_max)))[0]
         row_fwhm = (indices[-1] - indices[0]) / accuracy_factor
 
-        x = np.arange(number_of_pixels)
-        fitted_row = logistic_function(x, a, b, g, c)
-        fitted_rows.append(fitted_row)
+        fitted_parameters.append([a, b, g, c])
         row_fwhms.append(row_fwhm)
 
-    return np.mean(row_fwhms), np.mean(fitted_rows, axis=0)
+    return np.mean(row_fwhms), np.mean(np.array(fitted_parameters), axis=0)
 
 
 def calculate_vertical_profile(image):
