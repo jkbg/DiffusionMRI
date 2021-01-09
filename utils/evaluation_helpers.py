@@ -42,6 +42,48 @@ def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None):
     return performance
 
 
+def filter_duplicates(list):
+    filtered_list = []
+    for element in list:
+        if not any([np.array_equal(element, x) for x in filtered_list]):
+            filtered_list.append(element)
+    return filtered_list
+
+
+def split_performances(performances, keys):
+    if len(performances) == 0:
+        print('Empty list given as input.')
+        return performances
+    if len(keys) == 0:
+        return performances
+    elif len(keys) >= 1:
+        key = keys[-1]
+        splits = []
+        values = list(map(lambda x: x['id'][key], performances))
+        unique_values = filter_duplicates(values)
+        for unique_value in unique_values:
+            filtered_performances = list(filter(lambda x: x['id'][key] == unique_value, performances))
+            recursive = split_performances(filtered_performances, keys[:-1])
+            if isinstance(recursive[0], dict):
+                splits.append(recursive)
+            else:
+                splits.extend(recursive)
+        return splits
+
+
+def average_performances(performances, keys):
+    performance_parameters = [key for key in performances[0].keys() if key != 'id']
+    splits = split_performances(performances, keys)
+    avg_performances = []
+    for split in splits:
+        avg_performance = {'id': {x: split[0]['id'][x] for x in keys}}
+        for performance_parameter in performance_parameters:
+            avg_performance[performance_parameter] = np.mean([x[performance_parameter] for x in split])
+        avg_performances.append(avg_performance)
+    return avg_performances
+
+
+
 def calculate_model_performances(results):
     splitted_results = split_result_list(results, model_split=True, image_split=False)
     performances = []
@@ -64,14 +106,6 @@ def calculate_noisy_performance(results):
                                        psnr=np.mean([psnr(x[1], x[0]) for x in given_image_pairs]),
                                        ssim=np.mean([ssim(x[1], x[0]) for x in given_image_pairs]))
     return performance
-
-
-def filter_duplicates(list):
-    filtered_list = []
-    for element in list:
-        if not any([np.array_equal(element, x) for x in filtered_list]):
-            filtered_list.append(element)
-    return filtered_list
 
 
 def get_model_parameters_used(results):
@@ -112,22 +146,22 @@ def split_result_list(results, model_split=True, image_split=False):
 
     return further_splitted_result_list
 
-
-def split_performances(performances, split_type='number_of_channels'):
-    performances_split_per_type = {}
-    index = 0
-    if split_type == 'model_type':
-        index = 0
-    elif split_type == 'input_shape':
-        index = 1
-    elif split_type == 'number_of_layers':
-        index = 2
-    elif split_type == 'number_of_channels':
-        index = 3
-    all_types = list(map(lambda x: x['description'][index], performances))
-    unique_types = filter_duplicates(all_types)
-    for unique_type in unique_types:
-        performances_per_type = list(
-            filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
-        performances_split_per_type[str(unique_type)] = performances_per_type
-    return performances_split_per_type
+#
+# def split_performances(performances, split_type='number_of_channels'):
+#     performances_split_per_type = {}
+#     index = 0
+#     if split_type == 'model_type':
+#         index = 0
+#     elif split_type == 'input_shape':
+#         index = 1
+#     elif split_type == 'number_of_layers':
+#         index = 2
+#     elif split_type == 'number_of_channels':
+#         index = 3
+#     all_types = list(map(lambda x: x['description'][index], performances))
+#     unique_types = filter_duplicates(all_types)
+#     for unique_type in unique_types:
+#         performances_per_type = list(
+#             filter(lambda x: np.array_equal(x['description'][index], unique_type), performances))
+#         performances_split_per_type[str(unique_type)] = performances_per_type
+#     return performances_split_per_type
