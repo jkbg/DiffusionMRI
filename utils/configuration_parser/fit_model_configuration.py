@@ -1,55 +1,27 @@
-import argparse
 import torch
 import os
 
 
-def get_fit_model_configuration():
-    command_line_arguments = parse_command_line_arguments()
-    return ModelFittingConfiguration(command_line_arguments)
-
-
-def parse_command_line_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--image-dimensions', type=int,  nargs='+', default=[256, 256, 1])
-    parser.add_argument('--result-path', type=str, default='data/results/')
-    parser.add_argument('--model-type', type=str, default='deep')
-    parser.add_argument('--input-shape', type=input_shape, default=(8, 8))
-    parser.add_argument('--number-of-layers', type=int, default=6)
-    parser.add_argument('--number-of-hidden-channels', type=int, default=128)
-    parser.add_argument('--number-of-iterations', type=int, default=30000)
-    parser.add_argument('--learning-rate', type=float, default=0.1)
-    parser.add_argument('--convergence-check-length', type=int, default=100)
-    parser.add_argument('--log-frequency', type=int, default=1)
-    parser.add_argument('--find-best', type=bool, default=True)
-    parser.add_argument('--save-losses', type=bool, default=True)
-    parser.add_argument('--constant-input', action='store_true')
-    parser.add_argument('--cpu', action='store_true')
-    parsed_arguments, non_parsed_arguments = parser.parse_known_args()
-    return parsed_arguments
-
-
 class ModelFittingConfiguration:
-    def __init__(self, command_line_arguments):
-        self.image_dimensions = command_line_arguments.image_dimensions
-        self.result_path = command_line_arguments.result_path
+    def __init__(self):
+        self.image_dimensions = [100, 100, 1]
+        self.result_path = 'data/results'
 
-        self.model_type = command_line_arguments.model_type
-        self.input_shape = list(command_line_arguments.input_shape)
-        self.number_of_layers = command_line_arguments.number_of_layers
-        self.number_of_hidden_channels = command_line_arguments.number_of_hidden_channels
+        self.model_type = 'deep'
+        self.input_shape = [14, 14]
+        self.number_of_layers = 5
+        self.number_of_hidden_channels = 40
 
-        self.number_of_iterations = command_line_arguments.number_of_iterations
-        self.learning_rate = command_line_arguments.learning_rate
-        self.convergence_check_length = command_line_arguments.convergence_check_length
-        self.log_frequency = command_line_arguments.log_frequency
-        self.find_best = command_line_arguments.find_best
-        self.save_losses = command_line_arguments.save_losses
-        self.constant_input = command_line_arguments.constant_input
+        self.number_of_iterations = 3000
+        self.number_of_runs = 10
+        self.learning_rate = 0.1
+        self.convergence_check_length = None
+        self.log_frequency = 100
+        self.find_best = False
+        self.save_losses = False
+        self.constant_input = False
 
-        if command_line_arguments.cpu:
-            self.data_type = torch.FloatTensor
-        else:
-            self.data_type = torch.cuda.FloatTensor
+        self.data_type = torch.cuda.FloatTensor
 
     def __str__(self):
         dictionary = self.__dict__
@@ -57,11 +29,3 @@ class ModelFittingConfiguration:
         for key in dictionary:
             result += key + ": " + str(dictionary[key]) + "  " + os.linesep
         return result
-
-
-def input_shape(string):
-    try:
-        x, y = map(int, string.split(','))
-        return [x, y]
-    except:
-        raise argparse.ArgumentTypeError("Input Shapes must be x, y")
