@@ -35,7 +35,9 @@ class ModelFittingConfiguration:
 
 class GridsearchConfiguration:
     def __init__(self, ):
+        self.number_of_images = 20
         self.image_dimensions = [100, 100, 1]
+        self.image_path = 'data/imagenet_v2_top_images'
         self.result_path = 'data_results' + strftime("%Y-%m-%d-%H:%M-gridsearch.pkl", gmtime())
 
         self.model_types = ['deep']
