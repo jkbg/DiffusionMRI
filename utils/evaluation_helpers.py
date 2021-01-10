@@ -77,7 +77,7 @@ def average_performances(performances, keys):
     splits = split_performances(performances, [k for k in id_keys if k not in keys])
     avg_performances = []
     for split in splits:
-        avg_performance = {'id': {x: split[0]['id'][x] for x in keys}}
+        avg_performance = {'id': {k: split[0]['id'][k] for k in id_keys if k not in keys}}
         for performance_parameter in performance_parameters:
             avg_performance[performance_parameter] = np.mean([x[performance_parameter] for x in split])
         avg_performances.append(avg_performance)
