@@ -5,6 +5,10 @@ from fitting.Result import Result
 from utils.image_helpers import image_to_tensor, tensor_to_image
 
 
+def get_model_image(configuration):
+    fitter = create_fitter_from_configuration(configuration)
+
+
 def create_fitter_from_configuration(configuration):
     fitter = Fitter(number_of_iterations=configuration.number_of_iterations,
                     learning_rate=configuration.learning_rate,
@@ -58,7 +62,6 @@ class Fitter:
         else:
             self.log_prefix = log_prefix
         self.fit()
-        #TODO: Number of runs + averaging
 
     def fit(self):
         while self.has_not_converged() and self.step_counter < self.number_of_iterations:
