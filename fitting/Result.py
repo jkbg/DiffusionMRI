@@ -1,5 +1,5 @@
 import numpy as np
-from utils.evaluation_helpers import mse, psnr, ssim, vif, split_result_list
+from utils.evaluation_helpers import mse, psnr, ssim, vif
 
 #TODO: No more results, save as images in data
 
