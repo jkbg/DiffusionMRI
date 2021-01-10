@@ -38,7 +38,7 @@ class GridsearchConfiguration:
         self.number_of_images = 20
         self.image_dimensions = [100, 100, 1]
         self.image_path = 'data/imagenet_v2_top_images'
-        self.result_path = 'data_results' + strftime("%Y-%m-%d-%H:%M-gridsearch.pkl", gmtime())
+        self.result_path = 'data/' + strftime("%Y-%m-%d-%H:%M-gridsearch", gmtime())
 
         self.model_types = ['deep']
         self.input_shapes = [[2, 2], [4, 4], [8, 8], [16, 16]]
@@ -65,7 +65,16 @@ class GridsearchConfiguration:
                                                 input_shapes,
                                                 numbers_of_layers,
                                                 numbers_of_hidden_channels]))
-        return parameter_combinations
+        paths = []
+        for parameter_combination in parameter_combinations:
+            path = self.result_path
+            path += '/' + str(parameter_combination[0])
+            path += '/' + str(parameter_combination[1])
+            path += '/' + str(parameter_combination[2])
+            path += '/' + str(parameter_combination[3])
+            path += '/'
+            paths.append(path)
+        return parameter_combinations, paths
 
     def __str__(self):
         dictionary = self.__dict__

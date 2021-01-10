@@ -1,6 +1,7 @@
 import numpy as np
 from utils.evaluation_helpers import mse, psnr, ssim, vif, split_result_list
 
+#TODO: No more results, save as images in data
 
 def generate_rudimentary_result(model_parameters, noisy_image, model_image, target_image):
     loss_wrt_target = mse(target_image, model_image)
