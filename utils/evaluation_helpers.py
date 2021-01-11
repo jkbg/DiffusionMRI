@@ -1,6 +1,6 @@
 import numpy as np
 from skimage.metrics import structural_similarity
-from sewar.full_ref import vifp
+import scipy
 
 
 def mse(target, noisy):
@@ -16,7 +16,59 @@ def ssim(target, noisy):
 
 
 def vif(target, noisy):
-    return vifp(target, noisy)
+    return vifp_mscale(target, noisy)
+
+
+def vifp_mscale(ref, dist, sigma_nsq=1, eps=1e-10):
+    ### from https://github.com/aizvorski/video-quality/blob/master/vifp.py
+    sigma_nsq = sigma_nsq  ### tune this for your dataset to get reasonable numbers
+    eps = eps
+
+    num = 0.0
+    den = 0.0
+    for scale in range(1, 5):
+
+        N = 2 ** (4 - scale + 1) + 1
+        sd = N / 5.0
+
+        if (scale > 1):
+            ref = scipy.ndimage.gaussian_filter(ref, sd)
+            dist = scipy.ndimage.gaussian_filter(dist, sd)
+            ref = ref[::2, ::2]
+            dist = dist[::2, ::2]
+
+        mu1 = scipy.ndimage.gaussian_filter(ref, sd)
+        mu2 = scipy.ndimage.gaussian_filter(dist, sd)
+        mu1_sq = mu1 * mu1
+        mu2_sq = mu2 * mu2
+        mu1_mu2 = mu1 * mu2
+        sigma1_sq = scipy.ndimage.gaussian_filter(ref * ref, sd) - mu1_sq
+        sigma2_sq = scipy.ndimage.gaussian_filter(dist * dist, sd) - mu2_sq
+        sigma12 = scipy.ndimage.gaussian_filter(ref * dist, sd) - mu1_mu2
+
+        sigma1_sq[sigma1_sq < 0] = 0
+        sigma2_sq[sigma2_sq < 0] = 0
+
+        g = sigma12 / (sigma1_sq + eps)
+        sv_sq = sigma2_sq - g * sigma12
+
+        g[sigma1_sq < eps] = 0
+        sv_sq[sigma1_sq < eps] = sigma2_sq[sigma1_sq < eps]
+        sigma1_sq[sigma1_sq < eps] = 0
+
+        g[sigma2_sq < eps] = 0
+        sv_sq[sigma2_sq < eps] = 0
+
+        sv_sq[g < 0] = sigma2_sq[g < 0]
+        g[g < 0] = 0
+        sv_sq[sv_sq <= eps] = eps
+
+        num += np.sum(np.log10(1 + g * g * sigma1_sq / (sv_sq + sigma_nsq)))
+        den += np.sum(np.log10(1 + sigma1_sq / sigma_nsq))
+
+    vifp = num / den
+
+    return vifp
 
 
 def performance_from_images(reconstructed_image, target_image, id):

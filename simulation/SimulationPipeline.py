@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from utils.image_helpers import plot_image_grid
+from utils.image_helpers import plot_image_grid, get_images
 
 
 def fft(image):
@@ -122,4 +122,4 @@ def test_gibbscrop():
 
 
 if __name__ == '__main__':
-    test_gibbscrop()
+    test_pipeline()
