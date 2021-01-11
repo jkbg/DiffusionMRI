@@ -17,8 +17,8 @@ def image_to_tensor(image):
 
 def prepare_for_plot(image):
     image = np.array(image)
-    image = image - np.min(image)
-    image = image / np.max(image)
+    #image = image - np.min(image)
+    #image = image / np.max(image)
     return (image * 255).astype(np.uint8)
 
 
