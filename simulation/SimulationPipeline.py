@@ -14,6 +14,11 @@ def ifft(image):
     return np.fft.ifft2(image)
 
 
+def normalize(array):
+    array = array - np.min(array)
+    return array / np.max(array)
+
+
 def gibbs_crop(image_spectrum, k_factor):
     input_size = image_spectrum.shape
     cropped_size = tuple(map(lambda x: int(np.sqrt(k_factor) * x), input_size))
@@ -68,7 +73,7 @@ class SimulationPipeline:
 
         gibbs_image = ifft(image_spectrum)
 
-        noisy_image = gibbs_image
+        noisy_image = normalize(gibbs_image)
 
         if self.absolute_output:
             noisy_image = np.absolute(noisy_image)
@@ -84,9 +89,8 @@ class SimulationPipeline:
         return noisy_images
 
 
-if __name__ == '__main__':
+def test_pipeline():
     size = (130, 130)
-    diagonal_image = np.triu(np.ones(shape=size))
     vertical_image = np.concatenate((np.ones((size[0], size[1] // 2)), np.zeros((size[0], size[1] // 2))), axis=1)
 
     cnr_range = [0.1, 0.5, 1, 2, 4, 8, 16, 1024]
@@ -105,5 +109,17 @@ if __name__ == '__main__':
         print('')
 
     titles = [str(x) for x in cnr_range for _ in range(number_of_runs_per_cnr)]
-    plot = plot_image_grid(vertical_noisy_images, titles=titles, ncols=2)
+    plot_image_grid(vertical_noisy_images, titles=titles, ncols=2)
     plt.show()
+
+
+def test_gibbscrop():
+    image = np.ones((100, 100)) + 1j * np.ones((100, 100))
+    cropped_image, pad = gibbs_crop(image, 0.3)
+    padded_image = pad_cropped_spectrum(cropped_image, pad)
+    plot_image_grid([np.absolute(image)[:, :], np.absolute(padded_image)[:, :]])
+    plt.show()
+
+
+if __name__ == '__main__':
+    test_gibbscrop()
