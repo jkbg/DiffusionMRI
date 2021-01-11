@@ -13,7 +13,7 @@ def fit_model(noisy_image, configuration, log_prefix='', filename=None):
     run_images = []
     for run_index in range(configuration.number_of_runs):
         model = create_model_from_configuration(configuration)
-        extended_log_prefix = log_prefix + f'Run {run_index+1}/{configuration.number_of_runs}: '
+        extended_log_prefix = log_prefix + f'Run {run_index+1}/{configuration.number_of_runs}, '
         fitter(model, noisy_image, log_prefix=extended_log_prefix)
         run_images.append(fitter.get_best_image())
     fitted_image = np.mean(run_images, axis=0)
