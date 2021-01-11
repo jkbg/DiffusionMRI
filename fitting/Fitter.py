@@ -1,12 +1,27 @@
 import torch
 import copy
+import os
+import numpy as np
+from matplotlib import pyplot as plt
 
-from fitting.Result import Result
 from utils.image_helpers import image_to_tensor, tensor_to_image
+from models.model_creation import create_model_from_configuration
 
 
-def get_model_image(configuration):
+def fit_model(noisy_image, configuration, log_prefix='', filename=None):
     fitter = create_fitter_from_configuration(configuration)
+    run_images = []
+    for run_index in range(configuration.number_of_runs):
+        model = create_model_from_configuration(configuration)
+        extended_log_prefix = log_prefix + f'Run {run_index+1}/{configuration.number_of_runs}: '
+        fitter(model, noisy_image, log_prefix=extended_log_prefix)
+        run_images.append(fitter.get_best_image())
+    fitted_image = np.mean(run_images, axis=0)
+    if filename is not None:
+        if not os.path.exists(configuration.result_path):
+            os.makedirs(configuration.result_path)
+        plt.imsave(configuration.result_path + filename, fitted_image[:, :, 0], cmap='gray')
+    return fitted_image
 
 
 def create_fitter_from_configuration(configuration):
@@ -137,22 +152,3 @@ class Fitter:
 
     def get_best_image(self):
         return tensor_to_image(self.best_model(self.fixed_net_input).detach().cpu())
-
-    def get_final_target_loss(self):
-        if self.target_image is not None:
-            return self.loss_function(self.best_model(self.fixed_net_input).detach(), self.target_image)
-        else:
-            return 0
-
-    def get_step_counter(self):
-        return self.step_counter
-
-    def get_result(self):
-        result = Result(model_parameters=self.model.get_model_parameters(),
-                        noisy_image=tensor_to_image(self.noisy_image.cpu()),
-                        model_image=self.get_best_image(),
-                        target_image=tensor_to_image(self.target_image.cpu()),
-                        loss_wrt_target=self.get_final_target_loss().cpu().item(),
-                        number_of_iterations=self.step_counter,
-                        best_loss_wrt_noisy=self.best_model_loss.cpu())
-        return result
