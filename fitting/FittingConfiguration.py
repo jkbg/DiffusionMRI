@@ -2,7 +2,7 @@ import torch
 import os
 
 
-class ModelFittingConfiguration:
+class FittingConfiguration:
     def __init__(self):
         self.image_dimensions = [100, 100, 1]
         self.result_path = 'data/results'
