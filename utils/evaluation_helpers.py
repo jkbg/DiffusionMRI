@@ -71,7 +71,7 @@ def vifp_mscale(ref, dist, sigma_nsq=1, eps=1e-10):
     return vifp
 
 
-def performance_from_images(reconstructed_image, target_image, id):
+def performance_from_images(reconstructed_image, target_image, id=None):
     return generate_performance(id=id,
                                 mse=mse(target_image, reconstructed_image),
                                 psnr=psnr(target_image, reconstructed_image),
