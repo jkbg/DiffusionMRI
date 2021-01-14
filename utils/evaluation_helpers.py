@@ -71,7 +71,15 @@ def vifp_mscale(ref, dist, sigma_nsq=1, eps=1e-10):
     return vifp
 
 
+def standardize_array(array):
+    mean = np.mean(array)
+    std = np.std(array)
+    return (array - mean) / std
+
+
 def performance_from_images(reconstructed_image, target_image, id=None):
+    reconstructed_image = standardize_array(reconstructed_image)
+    target_image = standardize_array(target_image)
     return generate_performance(id=id,
                                 mse=mse(target_image, reconstructed_image),
                                 psnr=psnr(target_image, reconstructed_image),
@@ -134,6 +142,3 @@ def average_performances(performances, keys):
             avg_performance[performance_parameter] = np.mean([x[performance_parameter] for x in split])
         avg_performances.append(avg_performance)
     return avg_performances
-
-
-
