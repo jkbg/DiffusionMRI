@@ -16,7 +16,7 @@ def ssim(target, noisy):
 
 
 def vif(target, noisy):
-    return vifp_mscale(target, noisy)
+    return vifp_mscale(target, noisy, sigma_nsq=np.mean(target))
 
 
 def vifp_mscale(ref, dist, sigma_nsq=1, eps=1e-10):
@@ -71,15 +71,17 @@ def vifp_mscale(ref, dist, sigma_nsq=1, eps=1e-10):
     return vifp
 
 
-def standardize_array(array):
+def standardize_array(array, ref_array):
     mean = np.mean(array)
     std = np.std(array)
-    return (array - mean) / std
+    ref_mean = np.mean(ref_array)
+    ref_std = np.std(ref_array)
+    array = (array - mean) / std
+    return array * ref_std + ref_mean
 
 
 def performance_from_images(reconstructed_image, target_image, id=None):
-    reconstructed_image = standardize_array(reconstructed_image)
-    target_image = standardize_array(target_image)
+    reconstructed_image = standardize_array(reconstructed_image, target_image)
     return generate_performance(id=id,
                                 mse=mse(target_image, reconstructed_image),
                                 psnr=psnr(target_image, reconstructed_image),
