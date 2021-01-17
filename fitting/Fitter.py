@@ -16,7 +16,7 @@ def fit_model(noisy_image, configuration, log_prefix='', filename=None):
         extended_log_prefix = log_prefix + f'Run {run_index+1}/{configuration.number_of_runs}, '
         fitter(model, noisy_image, log_prefix=extended_log_prefix)
         run_images.append(fitter.get_best_image())
-    fitted_image = np.mean(run_images, axis=0)
+    fitted_image = np.median(run_images, axis=0)
     if filename is not None:
         if not os.path.exists(configuration.result_path):
             os.makedirs(configuration.result_path)
