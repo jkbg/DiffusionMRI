@@ -1,6 +1,11 @@
 import numpy as np
 from skimage.metrics import structural_similarity
 import scipy
+from pytorch_msssim import ms_ssim
+import torch
+
+from simulation.SimulationPipeline import SimulationPipeline
+from utils.image_helpers import get_images
 
 
 def mse(target, noisy):
@@ -17,6 +22,14 @@ def ssim(target, noisy):
 
 def vif(target, noisy):
     return vifp_mscale(target, noisy, sigma_nsq=np.mean(target))
+
+
+def msssim(target, noisy):
+    norm_target = normalize(target).astype('float64')[None, None, :, :]
+    norm_noisy = normalize(noisy).astype('float64')[None, None, :, :]
+    target_tensor = torch.from_numpy(norm_target)
+    noisy_tensor = torch.from_numpy(norm_noisy)
+    return ms_ssim(target_tensor, noisy_tensor, data_range=target_tensor.max()).data.cpu().numpy()
 
 
 def vifp_mscale(ref, dist, sigma_nsq=1, eps=1e-10):
@@ -80,16 +93,21 @@ def standardize_array(array, ref_array):
     return array * ref_std + ref_mean
 
 
+def normalize(array):
+    return (array - np.min(array)) / (np.max(array) - np.min(array))
+
+
 def performance_from_images(reconstructed_image, target_image, id=None):
     reconstructed_image = standardize_array(reconstructed_image, target_image)
     return generate_performance(id=id,
                                 mse=mse(target_image, reconstructed_image),
                                 psnr=psnr(target_image, reconstructed_image),
                                 vif=vif(target_image, reconstructed_image),
-                                ssim=ssim(target_image, reconstructed_image))
+                                ssim=ssim(target_image, reconstructed_image),
+                                msssim=msssim(target_image, reconstructed_image))
 
 
-def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None):
+def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None, msssim=None):
     performance = {}
     if id is not None:
         performance['id'] = id
@@ -101,6 +119,8 @@ def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None):
         performance['vif'] = vif
     if ssim is not None:
         performance['ssim'] = ssim
+    if msssim is not None:
+        performance['msssim'] = msssim
     return performance
 
 
@@ -144,3 +164,11 @@ def average_performances(performances, keys):
             avg_performance[performance_parameter] = np.mean([x[performance_parameter] for x in split])
         avg_performances.append(avg_performance)
     return avg_performances
+
+
+if __name__ == '__main__':
+    target_image = get_images('data/raw_images', size=256, max_amount=1)[0]
+    for snr in [64, 32, 16, 8, 4, 2, 1, 0.5, 0.25, 0.125]:
+        pipeline = SimulationPipeline(snr=snr)
+        noisy_image = pipeline.simulate(target_image)
+        print(snr, msssim(target_image, noisy_image))
