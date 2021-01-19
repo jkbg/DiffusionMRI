@@ -99,12 +99,19 @@ def normalize(array):
 
 def performance_from_images(reconstructed_image, target_image, id=None):
     reconstructed_image = standardize_array(reconstructed_image, target_image)
-    return generate_performance(id=id,
-                                mse=mse(target_image, reconstructed_image),
-                                psnr=psnr(target_image, reconstructed_image),
-                                vif=vif(target_image, reconstructed_image),
-                                ssim=ssim(target_image, reconstructed_image),
-                                msssim=msssim(target_image, reconstructed_image))
+    if target_image.shape[0] > 160 and target_image.shape[1] > 160:
+        return generate_performance(id=id,
+                                    mse=mse(target_image, reconstructed_image),
+                                    psnr=psnr(target_image, reconstructed_image),
+                                    vif=vif(target_image, reconstructed_image),
+                                    ssim=ssim(target_image, reconstructed_image),
+                                    msssim=msssim(target_image, reconstructed_image))
+    else:
+        return generate_performance(id=id,
+                                    mse=mse(target_image, reconstructed_image),
+                                    psnr=psnr(target_image, reconstructed_image),
+                                    vif=vif(target_image, reconstructed_image),
+                                    ssim=ssim(target_image, reconstructed_image))
 
 
 def generate_performance(id=None, mse=None, psnr=None, vif=None, ssim=None, msssim=None):
