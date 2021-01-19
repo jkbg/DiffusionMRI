@@ -42,10 +42,15 @@ def plot_image_grid(imgs, titles=None, ncols=4):
     return fig
 
 
-def get_images(path, max_amount, size=256):
-    transform = transforms.Compose([transforms.Grayscale(num_output_channels=1),
-                                    transforms.RandomResizedCrop(size=size, scale=(0.8, 1.0)),
-                                    transforms.ToTensor()])
+def get_images(path, max_amount, size=256, resize=True):
+    if resize:
+        transform = transforms.Compose([transforms.Grayscale(num_output_channels=1),
+                                        transforms.RandomResizedCrop(size=size, scale=(0.8, 1.0)),
+                                        transforms.ToTensor()])
+    else:
+        transform = transforms.Compose([transforms.Grayscale(num_output_channels=1),
+                                        transforms.RandomCrop(size=size, pad_if_needed=True, padding_mode='reflect'),
+                                        transforms.ToTensor()])
 
     image_dataset = datasets.ImageFolder(root=path, transform=transform)
     print(len(image_dataset), ' images found in ', path)
